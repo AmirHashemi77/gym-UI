@@ -9,6 +9,7 @@ import type {
   DecimalLike,
   Exercise,
   ExerciseBlockType,
+  Gender,
   Student,
   UpdateStudentRequest,
 } from '../api/types';
@@ -61,7 +62,7 @@ export function AthletesPage() {
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h1 className="text-2xl font-black">لیست ورزشکاران</h1>
-          <p className="text-sm text-slate-500 dark:text-slate-400">برای دیدن جزئیات و ساخت برنامه وارد پروفایل شوید.</p>
+          <p className="text-sm text-slate-500 dark:text-white/40">برای دیدن جزئیات و ساخت برنامه وارد پروفایل شوید.</p>
         </div>
         <Button onClick={() => setCreating(true)}>
           <Plus className="h-5 w-5" />
@@ -77,9 +78,9 @@ export function AthletesPage() {
           <Link key={student.id} to={`/coach/athletes/${student.id}`}>
             <Card className="h-full space-y-2">
               <h2 className="font-bold">{student.fullName}</h2>
-              <p className="text-sm text-slate-500 dark:text-slate-400">{student.phone}</p>
+              <p className="text-sm text-slate-500 dark:text-white/40">{student.phone}</p>
               {student.studentProfile?.goal ? (
-                <span className="inline-flex rounded-full bg-teal-50 px-3 py-1 text-xs font-bold text-teal-700 dark:bg-teal-500/10 dark:text-teal-300">
+                <span className="inline-flex rounded-full bg-brand-yellow/15 px-3 py-1 text-xs font-bold text-amber-700 dark:text-brand-yellow">
                   {student.studentProfile.goal}
                 </span>
               ) : null}
@@ -113,7 +114,7 @@ export function AthleteDetailPage() {
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
             <h1 className="text-2xl font-black">{student.fullName}</h1>
-            <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">{student.phone}</p>
+            <p className="mt-1 text-sm text-slate-500 dark:text-white/40">{student.phone}</p>
           </div>
           <div className="flex flex-wrap gap-2">
             <Link to={`/coach/athletes/${student.id}/new-program`}>
@@ -155,8 +156,9 @@ export function AthleteDetailPage() {
         {programs.map((program) => (
           <Card key={program.id}>
             <h3 className="font-bold">{program.title}</h3>
-            <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
+            <p className="mt-1 text-sm text-slate-500 dark:text-white/40">
               {formatPersianDate(program.createdAt)} - {program.days.length} روز
+              {program.durationDays ? ` | اعتبار: ${program.durationDays} روز` : ''}
             </p>
           </Card>
         ))}
@@ -206,8 +208,8 @@ function toDisplayText(value: unknown, fallback = '-') {
 
 function Info({ label, value }: { label: string; value: unknown }) {
   return (
-    <div className="rounded-lg bg-slate-50 p-3 dark:bg-slate-800/60">
-      <span className="block text-xs text-slate-500">{label}</span>
+    <div className="rounded-xl bg-slate-50 p-3 dark:bg-white/[0.05]">
+      <span className="block text-xs text-slate-500 dark:text-white/40">{label}</span>
       <strong className="mt-1 block">{toDisplayText(value)}</strong>
     </div>
   );
@@ -227,6 +229,7 @@ function StudentForm({ student, onClose }: { student?: Student; onClose: () => v
     weight: toDisplayText(profile?.weight, ''),
     height: toDisplayText(profile?.height, ''),
     goal: profile?.goal ?? '',
+    gender: (profile?.gender ?? '') as Gender | '',
   });
   const mutation = student ? updateStudent : createStudent;
 
@@ -245,6 +248,7 @@ function StudentForm({ student, onClose }: { student?: Student; onClose: () => v
       weight: toOptionalNumber(form.weight),
       height: toOptionalNumber(form.height),
       goal: toOptionalString(form.goal),
+      gender: form.gender || undefined,
     };
 
     if (student) {
@@ -275,6 +279,27 @@ function StudentForm({ student, onClose }: { student?: Student; onClose: () => v
           <Input placeholder="وزن" inputMode="decimal" value={form.weight} onChange={(event) => setForm({ ...form, weight: event.target.value })} />
           <Input placeholder="قد" inputMode="decimal" value={form.height} onChange={(event) => setForm({ ...form, height: event.target.value })} />
         </div>
+        <div className="flex gap-3">
+          {(['MALE', 'FEMALE'] as const).map((g) => (
+            <button
+              key={g}
+              type="button"
+              onClick={() => setForm({ ...form, gender: g })}
+              className={`flex flex-1 items-center justify-center gap-2.5 rounded-xl border py-2.5 text-sm font-semibold transition-all duration-200 ${
+                form.gender === g
+                  ? 'border-surface-dark bg-surface-dark text-white dark:border-brand-yellow dark:bg-brand-yellow dark:text-surface-dark'
+                  : 'border-slate-200 bg-white/80 text-slate-600 hover:border-slate-300 dark:border-white/10 dark:bg-white/[0.05] dark:text-white/60 dark:hover:bg-white/[0.09]'
+              }`}
+            >
+              <img
+                src={g === 'MALE' ? '/images/men.png' : '/images/women.png'}
+                alt={g === 'MALE' ? 'مرد' : 'زن'}
+                className="h-6 w-6 rounded-full object-cover"
+              />
+              {g === 'MALE' ? 'مرد' : 'زن'}
+            </button>
+          ))}
+        </div>
         <Textarea rows={3} placeholder="هدف" value={form.goal} onChange={(event) => setForm({ ...form, goal: event.target.value })} />
         {mutation.isError ? <p className="text-sm text-rose-600">{getApiErrorMessage(mutation.error)}</p> : null}
         {mutation.data?.message ? <p className="text-sm text-emerald-600">{mutation.data.message}</p> : null}
@@ -297,6 +322,7 @@ export function NewProgramPage() {
   const { data: studentResponse } = useStudent(id);
   const createProgram = useCreateProgram();
   const [daysCount, setDaysCount] = useState(3);
+  const [durationDays, setDurationDays] = useState(30);
   const [days, setDays] = useState<DraftProgramDay[]>(makeDays(3));
   const [activeDay, setActiveDay] = useState<DraftProgramDay | null>(null);
 
@@ -333,6 +359,7 @@ export function NewProgramPage() {
       {
         title: `برنامه ${formatPersianDate(new Date())}`,
         studentId: id,
+        durationDays,
         days: buildDaysPayload(),
       },
       {
@@ -345,7 +372,7 @@ export function NewProgramPage() {
     <section className="space-y-4">
       <div>
         <h1 className="text-2xl font-black">ساخت برنامه تمرینی جدید</h1>
-        <p className="text-sm text-slate-500 dark:text-slate-400">{studentResponse?.data.fullName}</p>
+        <p className="text-sm text-slate-500 dark:text-white/40">{studentResponse?.data.fullName}</p>
       </div>
       <Card className="space-y-4">
         <div>
@@ -358,9 +385,23 @@ export function NewProgramPage() {
             ))}
           </Select>
         </div>
+        <div>
+          <label className="mb-2 block text-sm font-bold">مدت اعتبار برنامه</label>
+          <Select value={durationDays} onChange={(event) => setDurationDays(Number(event.target.value))}>
+            {[14, 21, 30, 45, 60, 90].map((days) => (
+              <option key={days} value={days}>
+                {days} روز
+              </option>
+            ))}
+          </Select>
+        </div>
         <div className="grid gap-3 sm:grid-cols-2">
           {days.map((day) => (
-            <button key={day.id} className="rounded-lg border border-slate-200 bg-slate-50 p-4 text-right transition hover:border-teal-600 dark:border-slate-800 dark:bg-slate-900" onClick={() => setActiveDay(day)}>
+            <button
+              key={day.id}
+              className="rounded-xl border border-slate-200 bg-slate-50 p-4 text-right transition hover:border-brand-yellow/50 dark:border-white/10 dark:bg-white/[0.05] dark:hover:border-brand-yellow/40"
+              onClick={() => setActiveDay(day)}
+            >
               <span className="block font-bold">روز {day.dayNumber}</span>
               <span className="mt-1 block text-sm text-slate-500">{day.blocks.length} بلوک تمرینی</span>
             </button>
@@ -437,7 +478,7 @@ function DayExerciseModal({ day, onSave, onClose }: { day: DraftProgramDay; onSa
       <div className="space-y-4">
         {blocks.length === 0 ? <EmptyState title="هنوز حرکتی اضافه نشده است" /> : null}
         {blocks.map((block, blockIndex) => (
-          <div key={block.id} className="space-y-3 rounded-lg border border-slate-200 p-3 dark:border-slate-800">
+          <div key={block.id} className="space-y-3 rounded-xl border border-slate-200 p-3 dark:border-white/10">
             <div className="flex items-center justify-between gap-3">
               <span className="font-bold">بلوک {blockIndex + 1}</span>
               <Select className="max-w-36" value={block.type} onChange={(event) => updateBlockType(block.id, event.target.value as ExerciseBlockType)}>
@@ -450,7 +491,7 @@ function DayExerciseModal({ day, onSave, onClose }: { day: DraftProgramDay; onSa
             </div>
             <Textarea rows={2} placeholder="یادداشت این بلوک" value={block.note} onChange={(event) => updateBlockNote(block.id, event.target.value)} />
             {block.items.map((item, index) => (
-              <div key={index} className="grid gap-2 rounded-lg bg-slate-50 p-3 dark:bg-slate-900 sm:grid-cols-[1fr_90px_110px_110px]">
+              <div key={index} className="grid gap-2 rounded-xl bg-slate-50 p-3 dark:bg-white/[0.05] sm:grid-cols-[1fr_90px_110px_110px]">
                 <ExercisePicker value={item.exerciseId} onChange={(exerciseId) => updateItem(block.id, index, { exerciseId })} />
                 <Input placeholder="ست" inputMode="numeric" value={item.sets} onChange={(event) => updateItem(block.id, index, { sets: event.target.value })} />
                 <Input placeholder="تکرار" value={item.reps} onChange={(event) => updateItem(block.id, index, { reps: event.target.value })} />
@@ -495,7 +536,7 @@ export function ExerciseManagementPage() {
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h1 className="text-2xl font-black">مدیریت حرکات</h1>
-          <p className="text-sm text-slate-500 dark:text-slate-400">افزودن، ویرایش و حذف حرکات آموزشی.</p>
+          <p className="text-sm text-slate-500 dark:text-white/40">افزودن، ویرایش و حذف حرکات آموزشی.</p>
         </div>
         {canManage ? (
           <Button onClick={() => setCreating(true)}>
@@ -513,7 +554,7 @@ export function ExerciseManagementPage() {
             <div className="flex items-center justify-between gap-3">
               <div className="min-w-0">
                 <h2 className="font-bold">{exercise.title}</h2>
-                <p className="mt-1 line-clamp-2 text-sm leading-6 text-slate-500 dark:text-slate-400">
+                <p className="mt-1 line-clamp-2 text-sm leading-6 text-slate-500 dark:text-white/40">
                   {truncateText(exercise.description, 120) || 'توضیحاتی ثبت نشده است.'}
                 </p>
               </div>
@@ -590,7 +631,7 @@ function ExerciseForm({ exercise, onClose }: { exercise?: Exercise; onClose: () 
         <Input placeholder="آدرس ویدیو" value={form.videoUrl} onChange={(event) => setForm({ ...form, videoUrl: event.target.value })} />
         <Input placeholder="آدرس تصویر بندانگشتی" value={form.thumbnailUrl} onChange={(event) => setForm({ ...form, thumbnailUrl: event.target.value })} />
         <input
-          className="block w-full text-sm text-slate-500 file:ml-3 file:rounded-lg file:border-0 file:bg-slate-100 file:px-4 file:py-3 file:text-sm file:font-bold dark:file:bg-slate-800 dark:file:text-slate-100"
+          className="block w-full text-sm text-slate-500 dark:text-white/40 file:ml-3 file:rounded-xl file:border-0 file:bg-slate-100 file:px-4 file:py-3 file:text-sm file:font-bold dark:file:bg-white/[0.07] dark:file:text-white"
           type="file"
           accept="video/*"
           onChange={(event) => handleFileChange(event.target.files?.[0])}
@@ -631,12 +672,12 @@ export function QuestionsManagementPage() {
               <h2 className="font-bold">{question.student?.fullName ?? 'ورزشکار'}</h2>
               <p className="text-xs text-slate-500">{question.exercise?.title ?? 'سوال عمومی'}</p>
             </div>
-            <span className={`rounded-full px-3 py-1 text-xs ${question.status === 'ANSWERED' ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'}`}>
+            <span className={`rounded-full px-3 py-1 text-xs font-semibold ${question.status === 'ANSWERED' ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-400/10 dark:text-emerald-400' : 'bg-amber-100 text-amber-700 dark:bg-amber-400/10 dark:text-amber-400'}`}>
               {question.status === 'ANSWERED' ? 'پاسخ داده شده' : 'در انتظار پاسخ'}
             </span>
           </div>
-          <p className="text-sm leading-7 text-slate-700 dark:text-slate-200">{question.question}</p>
-          {question.answer ? <p className="rounded-lg bg-slate-100 p-3 text-sm leading-7 dark:bg-slate-800">{question.answer}</p> : null}
+          <p className="text-sm leading-7 text-slate-700 dark:text-white/70">{question.question}</p>
+          {question.answer ? <p className="rounded-xl bg-slate-100 p-3 text-sm leading-7 dark:bg-white/[0.07]">{question.answer}</p> : null}
           <AnswerQuestionForm id={question.id} />
         </Card>
       ))}
@@ -690,7 +731,7 @@ export function NotificationsPage() {
     <section className="space-y-4">
       <div>
         <h1 className="text-2xl font-black">ارسال اعلان</h1>
-        <p className="text-sm text-slate-500 dark:text-slate-400">payload برای push، sms و email آماده ارسال است.</p>
+        <p className="text-sm text-slate-500 dark:text-white/40">payload برای push، sms و email آماده ارسال است.</p>
       </div>
       <Card>
         <form className="space-y-3" onSubmit={handleSubmit}>

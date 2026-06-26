@@ -13,19 +13,19 @@ export function ExercisePicker({ value, onChange }: { value: string; onChange: (
     <div className="space-y-2">
       <Input placeholder="نام حرکت را تایپ کنید" value={selected?.title ?? term} onChange={(event) => setTerm(event.target.value)} />
       {term ? (
-        <div className="max-h-40 overflow-y-auto rounded-lg border border-slate-200 bg-white p-1 dark:border-slate-800 dark:bg-slate-950">
+        <div className="max-h-40 overflow-y-auto rounded-xl border border-slate-200 bg-white p-1 dark:border-white/10 dark:bg-white/[0.07] dark:backdrop-blur-md">
           {exercises.map((exercise) => (
             <button
               key={exercise.id}
               type="button"
-              className="block w-full rounded-md px-3 py-2 text-right text-sm hover:bg-slate-100 dark:hover:bg-slate-800"
+              className="block w-full rounded-lg px-3 py-2 text-right text-sm transition hover:bg-slate-100 dark:hover:bg-white/[0.07]"
               onClick={() => {
                 onChange(exercise.id);
                 setTerm('');
               }}
             >
               <span className="block font-medium">{exercise.title}</span>
-              <span className="mt-1 block text-xs leading-5 text-slate-500">{truncateText(exercise.description, 80) || 'توضیحاتی ثبت نشده است.'}</span>
+              <span className="mt-1 block text-xs leading-5 text-slate-500 dark:text-white/40">{truncateText(exercise.description, 80) || 'توضیحاتی ثبت نشده است.'}</span>
             </button>
           ))}
         </div>

@@ -54,6 +54,8 @@ export type DecimalLike = {
 
 export type DecimalValue = string | number | DecimalLike;
 
+export type Gender = 'MALE' | 'FEMALE';
+
 export type StudentProfile = {
   id: string;
   userId: string;
@@ -62,6 +64,7 @@ export type StudentProfile = {
   weight: DecimalValue | null;
   height: DecimalValue | null;
   goal: string | null;
+  gender: Gender | null;
   createdAt: string;
   updatedAt: string;
   deletedAt: string | null;
@@ -83,6 +86,7 @@ export type AuthUser = {
   email: string | null;
   role: Role;
   avatar: string | null;
+  gender: Gender | null;
 };
 
 export type AuthResponse = {
@@ -110,6 +114,7 @@ export type CreateStudentRequest = {
   weight?: number;
   height?: number;
   goal?: string;
+  gender?: Gender;
 };
 
 export type UpdateStudentRequest = Partial<Omit<CreateStudentRequest, 'password'>>;
@@ -184,6 +189,7 @@ export type Program = {
   title: string;
   studentId: string;
   coachId: string;
+  durationDays: number | null;
   createdAt: string;
   updatedAt: string;
   deletedAt: string | null;
@@ -197,6 +203,14 @@ export type Program = {
     fullName: string;
   };
   days: ProgramDay[];
+};
+
+export type ActiveProgramStats = {
+  programId: string;
+  programTitle: string;
+  totalDays: number;
+  completedDays: number;
+  remainingDays: number;
 };
 
 export type CreateExerciseBlockItemRequest = {
@@ -221,6 +235,7 @@ export type CreateProgramDayRequest = {
 export type CreateProgramRequest = {
   title: string;
   studentId: string;
+  durationDays?: number;
   days: CreateProgramDayRequest[];
 };
 

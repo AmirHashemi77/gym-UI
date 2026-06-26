@@ -1,5 +1,6 @@
 import { getAccessTokenPayload, http, unwrapResponse } from './http';
 import type {
+  ActiveProgramStats,
   ApiResponse,
   CreateProgramRequest,
   PaginatedResponse,
@@ -66,6 +67,11 @@ export const programsService = {
 
   deleteProgram: async (id: string): Promise<ApiResponse<null>> => {
     const response = await http.delete<ApiResponse<null>>(`/programs/${id}`);
+    return unwrapResponse(response);
+  },
+
+  getActiveStats: async (): Promise<ApiResponse<ActiveProgramStats>> => {
+    const response = await http.get<ApiResponse<ActiveProgramStats>>('/programs/active/stats');
     return unwrapResponse(response);
   },
 };

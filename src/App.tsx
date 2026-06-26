@@ -1,6 +1,6 @@
 import { Navigate, Route, Routes } from 'react-router-dom';
 import { ProtectedLayout } from './components/Layout';
-import { ExerciseDetailPage, ExerciseSearchPage, MyProgramsPage, MyQuestionsPage, ProgramDetailPage } from './pages/AthletePages';
+import { AthleteHomePage, ExerciseDetailPage, ExerciseSearchPage, MyProgramsPage, MyQuestionsPage, ProgramDetailPage } from './pages/AthletePages';
 import { LandingPage, LoginPage, StudentRegisterPage } from './pages/AuthPages';
 import { AthleteDetailPage, AthletesPage, ExerciseManagementPage, NewProgramPage, NotificationsPage, QuestionsManagementPage } from './pages/CoachPages';
 import { ForbiddenPage, ProtectedRoute, RoleGuard } from './features/auth';
@@ -17,7 +17,7 @@ export function App() {
       <Route element={<ProtectedRoute />}>
         <Route element={<RoleGuard roles={['STUDENT']} />}>
           <Route path="/athlete" element={<ProtectedLayout />}>
-            <Route index element={<Navigate to="/athlete/exercises" replace />} />
+            <Route index element={<AthleteHomePage />} />
             <Route path="exercises" element={<ExerciseSearchPage />} />
             <Route path="exercises/:id" element={<ExerciseDetailPage />} />
             <Route path="questions" element={<MyQuestionsPage />} />

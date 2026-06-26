@@ -61,3 +61,9 @@ export const useUnbookmarkExercise = () =>
   useMutation({
     mutationFn: (id: string) => exercisesService.removeExerciseBookmark(id),
   });
+
+export const usePopularExercises = (limit = 4) =>
+  useQuery({
+    queryKey: queryKeys.exercises.popular(limit),
+    queryFn: () => exercisesService.getPopular(limit),
+  });

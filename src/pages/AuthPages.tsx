@@ -2,7 +2,7 @@ import { FormEvent, useState } from 'react';
 import { Dumbbell, UserPlus } from 'lucide-react';
 import { Link, Navigate, useNavigate } from 'react-router-dom';
 import { getApiErrorMessage } from '../api/http';
-import type { CreateStudentRequest } from '../api/types';
+import type { CreateStudentRequest, Gender } from '../api/types';
 import { AuthLayout } from '../components/Layout';
 import { Button, Card, Input, Textarea, ThemeToggle } from '../components/ui';
 import { useAuth } from '../features/auth';
@@ -18,6 +18,7 @@ type StudentRegisterForm = {
   weight: string;
   height: string;
   goal: string;
+  gender: Gender | '';
 };
 
 type StudentRegisterErrors = Partial<Record<keyof StudentRegisterForm, string>>;
@@ -102,7 +103,7 @@ export function LandingPage() {
   const { user, isAuthenticated } = useAuth();
 
   if (isAuthenticated && user) {
-    return <Navigate to={user.role === 'STUDENT' ? '/athlete/exercises' : '/coach/athletes'} replace />;
+    return <Navigate to={user.role === 'STUDENT' ? '/athlete' : '/coach/athletes'} replace />;
   }
 
   return (
@@ -110,12 +111,12 @@ export function LandingPage() {
       <Card className="space-y-5">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <span className="grid h-12 w-12 place-items-center rounded-lg bg-teal-700 text-white">
-              <Dumbbell className="h-6 w-6" />
+            <span className="grid h-12 w-12 place-items-center rounded-xl bg-brand-yellow shadow-glow-sm">
+              <Dumbbell className="h-6 w-6 text-surface-dark" />
             </span>
             <div>
               <h1 className="text-xl font-black">Bahman Coach</h1>
-              <p className="text-sm text-slate-500 dark:text-slate-400">مدیریت تمرین، ورزشکار و پرسش ها</p>
+              <p className="text-sm text-slate-500 dark:text-white/40">مدیریت تمرین، ورزشکار و پرسش ها</p>
             </div>
           </div>
           <ThemeToggle />
@@ -150,7 +151,7 @@ export function LoginPage({ mode }: { mode: 'student' | 'staff' }) {
       {
         onSuccess: (response) => {
           const user = response.data.user;
-          navigate(user.role === 'STUDENT' ? '/athlete/exercises' : '/coach/athletes', { replace: true });
+          navigate(user.role === 'STUDENT' ? '/athlete' : '/coach/athletes', { replace: true });
         },
       },
     );
@@ -162,7 +163,7 @@ export function LoginPage({ mode }: { mode: 'student' | 'staff' }) {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-black">{isStaff ? 'ورود مربی / ادمین' : 'ورود ورزشکار'}</h1>
-            <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">شماره موبایل و رمز عبور خود را وارد کنید.</p>
+            <p className="mt-1 text-sm text-slate-500 dark:text-white/40">شماره موبایل و رمز عبور خود را وارد کنید.</p>
           </div>
           <ThemeToggle />
         </div>
@@ -196,9 +197,9 @@ export function LoginPage({ mode }: { mode: 'student' | 'staff' }) {
           </Button>
         </form>
         {!isStaff ? (
-          <div className="border-t border-slate-100 pt-4 text-center text-sm dark:border-slate-800">
-            <span className="text-slate-500 dark:text-slate-400">هنوز حساب ورزشکاری ندارید؟ </span>
-            <Link className="font-bold text-teal-700 dark:text-teal-300" to="/register">
+          <div className="border-t border-slate-100 pt-4 text-center text-sm dark:border-white/10">
+            <span className="text-slate-500 dark:text-white/40">هنوز حساب ورزشکاری ندارید؟ </span>
+            <Link className="font-bold text-green-700 dark:text-brand-yellow" to="/register">
               ثبت نام شاگرد
             </Link>
           </div>
@@ -223,10 +224,11 @@ export function StudentRegisterPage() {
     weight: '',
     height: '',
     goal: '',
+    gender: '',
   });
 
   if (isAuthenticated && user) {
-    return <Navigate to={user.role === 'STUDENT' ? '/athlete/exercises' : '/coach/athletes'} replace />;
+    return <Navigate to={user.role === 'STUDENT' ? '/athlete' : '/coach/athletes'} replace />;
   }
 
   const validationErrors = validateStudentRegisterForm(form);
@@ -250,6 +252,7 @@ export function StudentRegisterPage() {
       weight: toOptionalNumber(form.weight),
       height: toOptionalNumber(form.height),
       goal: toOptionalString(form.goal),
+      gender: form.gender || undefined,
     };
 
     registerStudent.mutate(payload, {
@@ -262,12 +265,12 @@ export function StudentRegisterPage() {
       <Card className="space-y-5">
         <div className="flex items-start justify-between gap-4">
           <div className="flex items-start gap-3">
-            <span className="grid h-12 w-12 shrink-0 place-items-center rounded-lg bg-teal-700 text-white">
-              <UserPlus className="h-6 w-6" />
+            <span className="grid h-12 w-12 shrink-0 place-items-center rounded-xl bg-brand-yellow shadow-glow-sm">
+              <UserPlus className="h-6 w-6 text-surface-dark" />
             </span>
             <div>
               <h1 className="text-2xl font-black">ثبت نام شاگرد</h1>
-              <p className="mt-1 text-sm leading-6 text-slate-500 dark:text-slate-400">
+              <p className="mt-1 text-sm leading-6 text-slate-500 dark:text-white/40">
                 اطلاعات اولیه خود را وارد کنید تا حساب ورزشکاری شما ساخته شود.
               </p>
             </div>
@@ -361,6 +364,29 @@ export function StudentRegisterPage() {
               <FieldError message={visibleErrors.height} />
             </div>
           </div>
+          {/* Gender */}
+          <div className="flex gap-3">
+            {(['MALE', 'FEMALE'] as const).map((g) => (
+              <button
+                key={g}
+                type="button"
+                onClick={() => setForm({ ...form, gender: g })}
+                className={`flex flex-1 items-center justify-center gap-2.5 rounded-xl border py-3 text-sm font-semibold transition-all duration-200 ${
+                  form.gender === g
+                    ? 'border-surface-dark bg-surface-dark text-white dark:border-brand-yellow dark:bg-brand-yellow dark:text-surface-dark'
+                    : 'border-slate-200 bg-white/80 text-slate-600 hover:border-slate-300 dark:border-white/10 dark:bg-white/[0.05] dark:text-white/60 dark:hover:bg-white/[0.09]'
+                }`}
+              >
+                <img
+                  src={g === 'MALE' ? '/images/men.png' : '/images/women.png'}
+                  alt={g === 'MALE' ? 'مرد' : 'زن'}
+                  className="h-7 w-7 rounded-full object-cover"
+                />
+                {g === 'MALE' ? 'مرد' : 'زن'}
+              </button>
+            ))}
+          </div>
+
           <div>
             <Textarea
               rows={3}
@@ -386,9 +412,9 @@ export function StudentRegisterPage() {
           </Button>
         </form>
 
-        <div className="border-t border-slate-100 pt-4 text-center text-sm dark:border-slate-800">
-          <span className="text-slate-500 dark:text-slate-400">قبلا ثبت نام کرده اید؟ </span>
-          <Link className="font-bold text-teal-700 dark:text-teal-300" to="/login">
+        <div className="border-t border-slate-100 pt-4 text-center text-sm dark:border-white/10">
+          <span className="text-slate-500 dark:text-white/40">قبلا ثبت نام کرده اید؟ </span>
+          <Link className="font-bold text-green-700 dark:text-brand-yellow" to="/login">
             ورود ورزشکار
           </Link>
         </div>

@@ -44,4 +44,9 @@ export const exercisesService = {
     const response = await http.delete<ApiResponse<null>>(`/exercises/${id}/bookmark`);
     return unwrapResponse(response);
   },
+
+  getPopular: async (limit = 4): Promise<ApiResponse<Exercise[]>> => {
+    const response = await http.get<ApiResponse<Exercise[]>>('/exercises/popular', { params: { limit } });
+    return unwrapResponse(response);
+  },
 };

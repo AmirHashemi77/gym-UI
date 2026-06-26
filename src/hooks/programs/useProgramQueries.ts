@@ -51,3 +51,9 @@ export const useDeleteProgram = () => {
     },
   });
 };
+
+export const useActiveProgramStats = () =>
+  useQuery({
+    queryKey: queryKeys.programs.activeStats,
+    queryFn: () => programsService.getActiveStats(),
+  });
