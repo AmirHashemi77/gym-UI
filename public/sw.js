@@ -15,6 +15,24 @@ self.addEventListener('activate', (event) => {
   self.clients.claim();
 });
 
+self.addEventListener('push', (event) => {
+  const data = event.data?.json() ?? {};
+  event.waitUntil(
+    self.registration.showNotification(data.title ?? 'یادآوری وعده غذایی', {
+      body: data.body ?? '',
+      icon: '/icons/icon.svg',
+      badge: '/icons/icon.svg',
+      dir: 'rtl',
+      lang: 'fa',
+    }),
+  );
+});
+
+self.addEventListener('notificationclick', (event) => {
+  event.notification.close();
+  event.waitUntil(clients.openWindow('/athlete/nutrition'));
+});
+
 self.addEventListener('fetch', (event) => {
   if (event.request.method !== 'GET') return;
   event.respondWith(

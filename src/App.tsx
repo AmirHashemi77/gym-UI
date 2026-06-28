@@ -1,8 +1,8 @@
-import { Navigate, Route, Routes } from 'react-router-dom';
+import { Route, Routes, Navigate } from 'react-router-dom';
 import { ProtectedLayout } from './components/Layout';
-import { AthleteHomePage, ExerciseDetailPage, ExerciseSearchPage, MyProgramsPage, MyQuestionsPage, ProgramDetailPage } from './pages/AthletePages';
+import { AthleteHomePage, ExerciseDetailPage, ExerciseSearchPage, MyProgramsPage, MyQuestionsPage, NutritionPage, ProgramDetailPage } from './pages/AthletePages';
 import { LandingPage, LoginPage, StudentRegisterPage } from './pages/AuthPages';
-import { AthleteDetailPage, AthletesPage, ExerciseManagementPage, NewProgramPage, NotificationsPage, QuestionsManagementPage } from './pages/CoachPages';
+import { AthleteDetailPage, AthletesPage, CoachHomePage, ExerciseManagementPage, NewProgramPage, NotificationsPage, NutritionPlanPage, QuestionsManagementPage } from './pages/CoachPages';
 import { ForbiddenPage, ProtectedRoute, RoleGuard } from './features/auth';
 
 export function App() {
@@ -20,6 +20,7 @@ export function App() {
             <Route index element={<AthleteHomePage />} />
             <Route path="exercises" element={<ExerciseSearchPage />} />
             <Route path="exercises/:id" element={<ExerciseDetailPage />} />
+            <Route path="nutrition" element={<NutritionPage />} />
             <Route path="questions" element={<MyQuestionsPage />} />
             <Route path="programs" element={<MyProgramsPage />} />
             <Route path="programs/:id" element={<ProgramDetailPage />} />
@@ -28,11 +29,12 @@ export function App() {
 
         <Route element={<RoleGuard roles={['COACH', 'ADMIN']} />}>
           <Route path="/coach" element={<ProtectedLayout />}>
-            <Route index element={<Navigate to="/coach/athletes" replace />} />
+            <Route index element={<CoachHomePage />} />
             <Route path="athletes" element={<AthletesPage />} />
             <Route path="athletes/:id" element={<AthleteDetailPage />} />
             <Route path="athletes/:id/new-program" element={<NewProgramPage />} />
             <Route path="exercises" element={<ExerciseManagementPage />} />
+            <Route path="nutrition" element={<NutritionPlanPage />} />
             <Route path="questions" element={<QuestionsManagementPage />} />
             <Route path="notifications" element={<NotificationsPage />} />
           </Route>

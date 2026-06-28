@@ -14,6 +14,21 @@ export type Role = 'ADMIN' | 'COACH' | 'STUDENT';
 
 export type ExerciseBlockType = 'NORMAL' | 'SUPERSET' | 'TRISET';
 
+export type MuscleGroup =
+  | 'CHEST'
+  | 'BACK'
+  | 'SHOULDERS'
+  | 'BICEPS'
+  | 'TRICEPS'
+  | 'FOREARMS'
+  | 'CORE'
+  | 'GLUTES'
+  | 'QUADRICEPS'
+  | 'HAMSTRINGS'
+  | 'CALVES'
+  | 'FULL_BODY'
+  | 'CARDIO';
+
 export type QuestionStatus = 'PENDING' | 'ANSWERED';
 
 export type PaginationQuery = {
@@ -126,6 +141,8 @@ export type Exercise = {
   description: string | null;
   videoUrl: string | null;
   thumbnailUrl: string | null;
+  imageUrl: string | null;
+  muscleGroup: MuscleGroup | null;
   createdBy: string;
   createdAt: string;
   updatedAt: string;
@@ -141,6 +158,8 @@ export type CreateExerciseRequest = {
   description?: string;
   videoUrl?: string;
   thumbnailUrl?: string;
+  imageUrl?: string;
+  muscleGroup?: MuscleGroup;
 };
 
 export type UpdateExerciseRequest = Partial<CreateExerciseRequest>;
@@ -211,6 +230,8 @@ export type ActiveProgramStats = {
   totalDays: number;
   completedDays: number;
   remainingDays: number;
+  durationDays: number | null;
+  calendarRemainingDays: number | null;
 };
 
 export type CreateExerciseBlockItemRequest = {
@@ -280,6 +301,13 @@ export type UploadVideoResponse = {
   size: number;
 };
 
+export type UploadImageResponse = {
+  url: string;
+  key: string;
+  mimeType: string;
+  size: number;
+};
+
 export type SendNotificationRequest = {
   userId?: string;
   title: string;
@@ -293,4 +321,74 @@ export type SendNotificationResponse = {
     email: 'READY';
   };
   payload: SendNotificationRequest;
+};
+
+export type CoachDashboardStats = {
+  totalStudents: number;
+  newStudentsThisMonth: number;
+  programsThisMonth: number;
+  unansweredQuestions: number;
+};
+
+export type ExpiredProgramStudent = {
+  studentId: string;
+  studentName: string;
+  studentPhone: string;
+  lastProgramId: string;
+  lastProgramTitle: string;
+  lastProgramCreatedAt: string;
+  durationDays: number;
+  expiredAt: string;
+};
+
+export type MealType = 'BREAKFAST' | 'LUNCH' | 'DINNER' | 'SNACK';
+
+export type NutritionMeal = {
+  id: string;
+  planId: string;
+  type: MealType;
+  label: string;
+  description: string;
+  order: number;
+  reminderTime: string | null;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type NutritionPlan = {
+  id: string;
+  studentId: string;
+  coachId: string;
+  createdAt: string;
+  updatedAt: string;
+  meals: NutritionMeal[];
+  student?: {
+    id: string;
+    fullName: string;
+    phone: string;
+  };
+};
+
+export type CreateNutritionMealRequest = {
+  type: MealType;
+  label: string;
+  description: string;
+  order: number;
+};
+
+export type CreateNutritionPlanRequest = {
+  studentId: string;
+  meals: CreateNutritionMealRequest[];
+};
+
+export type UpdateMealReminderRequest = {
+  reminderTime: string | null;
+};
+
+export type PushSubscriptionBody = {
+  endpoint: string;
+  keys: {
+    p256dh: string;
+    auth: string;
+  };
 };

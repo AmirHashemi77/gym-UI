@@ -1,10 +1,10 @@
 import { type ReactNode } from 'react';
-import { Bell, Dumbbell, Home, LogOut, MessageSquare, NotebookText, Search, Users } from 'lucide-react';
+import { Bell, Dumbbell, Home, LogOut, MessageSquare, NotebookText, Search, UtensilsCrossed, Users } from 'lucide-react';
 import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useLogout } from '../hooks/auth';
 import { useAuth } from '../features/auth';
-import { Button, ThemeToggle } from './ui';
+import { Button } from './ui';
 
 export function AuthLayout({ children, size = 'default' }: { children: ReactNode; size?: 'default' | 'wide' }) {
   return (
@@ -31,21 +31,24 @@ export function ProtectedLayout() {
     { to: '/athlete', label: 'خانه', icon: Home, end: true },
     { to: '/athlete/exercises', label: 'حرکات', icon: Search },
     { to: '/athlete/programs', label: 'برنامه ها', icon: NotebookText },
+    { to: '/athlete/nutrition', label: 'تغذیه', icon: UtensilsCrossed },
     { to: '/athlete/questions', label: 'سوال ها', icon: MessageSquare },
   ];
 
   const coachLinks = [
+    { to: '/coach', label: 'خانه', icon: Home, end: true },
     { to: '/coach/athletes', label: 'ورزشکاران', icon: Users },
     { to: '/coach/exercises', label: 'حرکات', icon: Dumbbell },
+    { to: '/coach/nutrition', label: 'تغذیه', icon: UtensilsCrossed },
     { to: '/coach/questions', label: 'سوال ها', icon: MessageSquare },
     { to: '/coach/notifications', label: 'اعلان ها', icon: Bell },
   ];
 
   const links = isStudent ? studentLinks : coachLinks;
-  const homePath = isStudent ? '/athlete' : '/coach/athletes';
+  const homePath = isStudent ? '/athlete' : '/coach';
 
   return (
-    <div className="min-h-screen pb-28 text-slate-950 dark:text-white md:pb-0">
+    <div className="min-h-screen overflow-x-hidden pb-28 text-slate-950 dark:text-white md:pb-0">
       <header className="sticky top-0 z-30 border-b border-slate-200/60 bg-white/70 backdrop-blur-xl dark:border-white/[0.08] dark:bg-surface-dark/60">
         <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-3">
           <button className="flex items-center gap-3 text-right" onClick={() => navigate(homePath)}>
@@ -58,7 +61,6 @@ export function ProtectedLayout() {
             </span>
           </button>
           <div className="flex items-center gap-2">
-            <ThemeToggle />
             <button
               className="grid h-12 w-12 place-items-center rounded-xl text-slate-600 transition hover:bg-slate-100/70 disabled:opacity-50 dark:text-white/70 dark:hover:bg-white/[0.07]"
               disabled={logout.isPending}
@@ -86,6 +88,7 @@ export function ProtectedLayout() {
 
         <motion.div
           key={location.pathname}
+          className="min-w-0"
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1] }}

@@ -3,6 +3,7 @@ import type {
   ActiveProgramStats,
   ApiResponse,
   CreateProgramRequest,
+  ExpiredProgramStudent,
   PaginatedResponse,
   Program,
   ProgramsQuery,
@@ -72,6 +73,11 @@ export const programsService = {
 
   getActiveStats: async (): Promise<ApiResponse<ActiveProgramStats>> => {
     const response = await http.get<ApiResponse<ActiveProgramStats>>('/programs/active/stats');
+    return unwrapResponse(response);
+  },
+
+  getExpiredProgramStudents: async (): Promise<ApiResponse<ExpiredProgramStudent[]>> => {
+    const response = await http.get<ApiResponse<ExpiredProgramStudent[]>>('/programs/students/expired');
     return unwrapResponse(response);
   },
 };

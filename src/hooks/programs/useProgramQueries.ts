@@ -57,3 +57,9 @@ export const useActiveProgramStats = () =>
     queryKey: queryKeys.programs.activeStats,
     queryFn: () => programsService.getActiveStats(),
   });
+
+export const useExpiredProgramStudents = () =>
+  useQuery({
+    queryKey: queryKeys.programs.expiredStudents,
+    queryFn: () => programsService.getExpiredProgramStudents(),
+  });

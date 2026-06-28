@@ -3,6 +3,12 @@ import { useAuthStore } from '../features/auth/auth.store';
 import type { ApiErrorResponse, ApiResponse, AuthResponse, RefreshTokenRequest, Role } from './types';
 
 export const API_BASE_URL = 'http://localhost:3000/api/v1';
+export const MEDIA_BASE_URL = API_BASE_URL.replace('/api/v1', '');
+
+export const getMediaUrl = (path: string | null | undefined): string | null => {
+  if (!path) return null;
+  return `${MEDIA_BASE_URL}/${path}`;
+};
 
 export const ACCESS_TOKEN_KEY = 'accessToken';
 export const REFRESH_TOKEN_KEY = 'refreshToken';

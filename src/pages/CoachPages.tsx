@@ -1,29 +1,52 @@
-import { Edit, Plus, Send, Trash2 } from 'lucide-react';
-import { FormEvent, useState } from 'react';
+import { Bell, Check, CheckCircle2, ChevronLeft, ChevronRight, Clock, Edit, MessageSquare, NotebookText, Plus, Send, Trash2, UserPlus, Users, UtensilsCrossed, type LucideIcon } from 'lucide-react';
+import { FormEvent, useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import { getApiErrorMessage } from '../api/http';
 import type {
   CreateExerciseRequest,
+  CreateNutritionMealRequest,
   CreateProgramDayRequest,
   CreateStudentRequest,
   DecimalLike,
   Exercise,
   ExerciseBlockType,
   Gender,
+  MealType,
+  MuscleGroup,
   Student,
   UpdateStudentRequest,
 } from '../api/types';
 import { ExercisePicker } from '../components/ExercisePicker';
-import { Button, Card, EmptyState, Input, Modal, SearchBox, Select, Textarea } from '../components/ui';
+import { Button, Card, EmptyState, Input, Modal, ScrollLoader, SearchBox, Select, Textarea } from '../components/ui';
 import { useAuth } from '../features/auth';
-import { useCreateExercise, useDeleteExercise, useExercises, useUpdateExercise } from '../hooks/exercises';
+import { useCreateExercise, useDeleteExercise, useInfiniteExercises, useUpdateExercise } from '../hooks/exercises';
+import { useScrollSentinel } from '../hooks/useScrollSentinel';
 import { useSendNotification } from '../hooks/notifications';
-import { useCreateProgram, usePrograms } from '../hooks/programs';
+import { useCreateProgram, useExpiredProgramStudents, useProgram, usePrograms } from '../hooks/programs';
+import { useCoachDashboard } from '../hooks/stats';
 import { useAnswerQuestion, useQuestions } from '../hooks/questions';
-import { useUploadVideo } from '../hooks/upload';
-import { useCreateStudent, useDeleteStudent, useStudent, useStudents, useUpdateStudent } from '../hooks/users';
+import { useUploadImage, useUploadVideo } from '../hooks/upload';
+import { useCreateNutritionPlan, useStudentNutritionPlan } from '../hooks/nutrition';
+import { useCreateStudent, useDeleteStudent, useInfiniteStudents, useStudent, useStudents, useUpdateStudent } from '../hooks/users';
 import { formatPersianDate } from '../utils/date';
 import { truncateText } from '../utils/text';
+
+const muscleGroupLabels: Record<MuscleGroup, string> = {
+  CHEST: 'سینه',
+  BACK: 'پشت',
+  SHOULDERS: 'شانه',
+  BICEPS: 'دو سر',
+  TRICEPS: 'سه سر',
+  FOREARMS: 'ساعد',
+  CORE: 'شکم و هسته',
+  GLUTES: 'سرینی',
+  QUADRICEPS: 'چهار سر ران',
+  HAMSTRINGS: 'همسترینگ',
+  CALVES: 'ساق پا',
+  FULL_BODY: 'تمام بدن',
+  CARDIO: 'کاردیو',
+};
 
 const blockLabels: Record<ExerciseBlockType, string> = {
   NORMAL: 'معمولی',
@@ -51,11 +74,176 @@ type DraftProgramDay = {
   blocks: DraftProgramBlock[];
 };
 
+const todayFormatter = new Intl.DateTimeFormat('fa-IR-u-ca-persian', {
+  weekday: 'long',
+  year: 'numeric',
+  month: 'long',
+  day: 'numeric',
+});
+
+function useCountUp(target: number, enabled: boolean, duration = 1100) {
+  const [value, setValue] = useState(0);
+
+  useEffect(() => {
+    if (!enabled) return;
+    setValue(0);
+    if (target === 0) { setValue(0); return; }
+    let raf: number;
+    const startTime = performance.now();
+    const tick = (now: number) => {
+      const p = Math.min((now - startTime) / duration, 1);
+      setValue(Math.round((1 - (1 - p) ** 3) * target));
+      if (p < 1) raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [target, enabled, duration]);
+
+  return value;
+}
+
+export function CoachHomePage() {
+  const { user } = useAuth();
+  const [creatingStudent, setCreatingStudent] = useState(false);
+  const { data, isLoading } = useCoachDashboard();
+  const stats = data?.data;
+  const today = todayFormatter.format(new Date());
+
+  const statCards = [
+    {
+      label: 'کل شاگردان',
+      value: stats?.totalStudents ?? 0,
+      icon: Users,
+      colorClass: 'bg-surface-dark/10 text-surface-dark dark:bg-brand-yellow/15 dark:text-brand-yellow',
+    },
+    {
+      label: 'شاگرد جدید این ماه',
+      value: stats?.newStudentsThisMonth ?? 0,
+      icon: UserPlus,
+      colorClass: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-400/10 dark:text-emerald-400',
+    },
+    {
+      label: 'برنامه این ماه',
+      value: stats?.programsThisMonth ?? 0,
+      icon: NotebookText,
+      colorClass: 'bg-blue-100 text-blue-700 dark:bg-blue-400/10 dark:text-blue-400',
+    },
+    {
+      label: 'سوال بی‌پاسخ',
+      value: stats?.unansweredQuestions ?? 0,
+      icon: MessageSquare,
+      colorClass: 'bg-rose-100 text-rose-700 dark:bg-rose-400/10 dark:text-rose-400',
+    },
+  ] as const;
+
+  return (
+    <section className="space-y-5">
+      <motion.div
+        initial={{ opacity: 0, y: -10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+        className="relative overflow-hidden rounded-2xl bg-surface-dark p-5 text-white"
+      >
+        <div className="pointer-events-none absolute -left-8 -top-8 h-36 w-36 rounded-full bg-brand-yellow/20 blur-3xl" />
+        <div className="pointer-events-none absolute -bottom-10 -right-6 h-44 w-44 rounded-full bg-brand-yellow/10 blur-3xl" />
+        <div className="relative">
+          <p className="text-sm text-white/50">{today}</p>
+          <h1 className="mt-1 text-2xl font-black">
+            سلام،{' '}
+            <span className="text-brand-yellow">{user?.fullName}</span>!
+          </h1>
+          <p className="mt-1 text-sm text-white/55">به پنل مربی خوش آمدید.</p>
+        </div>
+      </motion.div>
+
+      <div className="grid grid-cols-2 gap-3">
+        {statCards.map((card, i) => (
+          <DashStatCard key={card.label} {...card} index={i} loading={isLoading} />
+        ))}
+      </div>
+
+      <div>
+        <p className="mb-3 text-xs font-bold uppercase tracking-widest text-slate-400 dark:text-white/30">دسترسی سریع</p>
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+          <QuickActionLink to="/coach/athletes" icon={Users} label="ورزشکاران" />
+          <QuickActionButton icon={UserPlus} label="ورزشکار جدید" onClick={() => setCreatingStudent(true)} />
+          <QuickActionLink to="/coach/questions" icon={MessageSquare} label="سوالات" />
+          <QuickActionLink to="/coach/notifications" icon={Bell} label="ارسال اعلان" />
+        </div>
+      </div>
+
+      {creatingStudent ? <StudentForm onClose={() => setCreatingStudent(false)} /> : null}
+    </section>
+  );
+}
+
+function DashStatCard({
+  label,
+  value,
+  icon: Icon,
+  colorClass,
+  index,
+  loading,
+}: {
+  label: string;
+  value: number;
+  icon: LucideIcon;
+  colorClass: string;
+  index: number;
+  loading: boolean;
+}) {
+  const count = useCountUp(value, !loading);
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.45, delay: 0.1 + index * 0.07, ease: [0.16, 1, 0.3, 1] }}
+    >
+      <Card className="space-y-3">
+        <span className={`inline-flex rounded-xl p-2.5 ${colorClass}`}>
+          <Icon className="h-5 w-5" />
+        </span>
+        {loading ? (
+          <div className="h-9 w-14 animate-pulse rounded-lg bg-slate-200 dark:bg-white/10" />
+        ) : (
+          <p className="text-3xl font-black tabular-nums">{count.toLocaleString('fa-IR')}</p>
+        )}
+        <p className="text-sm text-slate-500 dark:text-white/40">{label}</p>
+      </Card>
+    </motion.div>
+  );
+}
+
+function QuickActionLink({ to, icon: Icon, label }: { to: string; icon: LucideIcon; label: string }) {
+  return (
+    <Link to={to} className="flex flex-col items-center gap-2 rounded-2xl border border-slate-200 bg-white/60 p-4 text-center transition-all duration-200 hover:border-slate-300 hover:bg-slate-50 dark:border-white/10 dark:bg-white/[0.04] dark:hover:bg-white/[0.08]">
+      <Icon className="h-6 w-6 text-slate-600 dark:text-white/70" />
+      <span className="text-sm font-semibold">{label}</span>
+    </Link>
+  );
+}
+
+function QuickActionButton({ icon: Icon, label, onClick }: { icon: LucideIcon; label: string; onClick: () => void }) {
+  return (
+    <button
+      onClick={onClick}
+      className="flex flex-col items-center gap-2 rounded-2xl border border-slate-200 bg-white/60 p-4 text-center transition-all duration-200 hover:border-slate-300 hover:bg-slate-50 dark:border-white/10 dark:bg-white/[0.04] dark:hover:bg-white/[0.08]"
+    >
+      <Icon className="h-6 w-6 text-slate-600 dark:text-white/70" />
+      <span className="text-sm font-semibold">{label}</span>
+    </button>
+  );
+}
+
 export function AthletesPage() {
   const [search, setSearch] = useState('');
   const [creating, setCreating] = useState(false);
-  const { data: response, isLoading, isError, error } = useStudents({ search });
-  const students = response?.data.items ?? [];
+  const { data, isLoading, isError, error, fetchNextPage, hasNextPage, isFetchingNextPage } = useInfiniteStudents({ search });
+  const { data: expiredResponse, isLoading: expiredLoading } = useExpiredProgramStudents();
+  const students = data?.pages.flatMap((p) => p.data.items) ?? [];
+  const expiredStudents = expiredResponse?.data ?? [];
+  const sentinelRef = useScrollSentinel(fetchNextPage, hasNextPage && !isFetchingNextPage);
 
   return (
     <section className="space-y-4">
@@ -69,6 +257,41 @@ export function AthletesPage() {
           ورزشکار جدید
         </Button>
       </div>
+
+      <div className="rounded-2xl border border-amber-200 bg-amber-50 p-4 dark:border-amber-400/20 dark:bg-amber-400/[0.06]">
+        <div className="mb-3 flex items-center gap-2">
+          <Clock className="h-5 w-5 text-amber-600 dark:text-amber-400" />
+          <h2 className="font-bold text-amber-800 dark:text-amber-300">برنامه منقضی‌شده</h2>
+          {!expiredLoading && expiredStudents.length > 0 ? (
+            <span className="mr-auto rounded-full bg-amber-200 px-2.5 py-0.5 text-xs font-bold text-amber-800 dark:bg-amber-400/20 dark:text-amber-300">
+              {expiredStudents.length} نفر
+            </span>
+          ) : null}
+        </div>
+        {expiredLoading ? (
+          <p className="text-sm text-amber-700 dark:text-amber-400">در حال دریافت...</p>
+        ) : expiredStudents.length === 0 ? (
+          <p className="text-sm text-amber-700 dark:text-amber-400">همه ورزشکاران برنامه فعال دارند.</p>
+        ) : (
+          <div className="space-y-2">
+            {expiredStudents.map((item) => (
+              <Link key={item.studentId} to={`/coach/athletes/${item.studentId}`}>
+                <div className="flex items-center justify-between gap-3 rounded-xl bg-white p-3 transition hover:bg-amber-50 dark:bg-white/[0.05] dark:hover:bg-white/[0.08]">
+                  <div className="min-w-0">
+                    <p className="font-bold text-slate-800 dark:text-white">{item.studentName}</p>
+                    <p className="truncate text-sm text-slate-500 dark:text-white/40">{item.lastProgramTitle}</p>
+                  </div>
+                  <div className="shrink-0 text-left">
+                    <p className="text-xs font-semibold text-amber-600 dark:text-amber-400">منقضی شده</p>
+                    <p className="text-xs text-slate-400 dark:text-white/30">{formatPersianDate(item.expiredAt)}</p>
+                  </div>
+                </div>
+              </Link>
+            ))}
+          </div>
+        )}
+      </div>
+
       <SearchBox placeholder="جستجو در ورزشکاران" value={search} onChange={(event) => setSearch(event.target.value)} />
       {isLoading ? <EmptyState title="در حال دریافت ورزشکاران..." /> : null}
       {isError ? <EmptyState title={getApiErrorMessage(error)} /> : null}
@@ -88,6 +311,8 @@ export function AthletesPage() {
           </Link>
         ))}
       </div>
+      <div ref={sentinelRef} />
+      {isFetchingNextPage ? <ScrollLoader /> : null}
       {creating ? <StudentForm onClose={() => setCreating(false)} /> : null}
     </section>
   );
@@ -97,12 +322,32 @@ export function AthleteDetailPage() {
   const { id = '' } = useParams();
   const navigate = useNavigate();
   const [editing, setEditing] = useState(false);
+  const [selectedProgramId, setSelectedProgramId] = useState<string | null>(null);
+  const [showNutritionModal, setShowNutritionModal] = useState(false);
   const selectedStudentId = id.trim();
+
   const { data: response, isLoading, isError, error } = useStudent(id);
   const { data: programsResponse } = usePrograms(selectedStudentId ? { studentId: selectedStudentId } : undefined);
+  const { data: nutritionRes } = useStudentNutritionPlan(selectedStudentId);
+  const { data: programDetailRes, isLoading: programDetailLoading } = useProgram(selectedProgramId ?? '');
+
   const deleteStudent = useDeleteStudent();
   const student = response?.data;
   const programs = programsResponse?.data.items ?? [];
+  const nutritionPlan = nutritionRes?.data ?? null;
+  const programDetail = programDetailRes?.data ?? null;
+
+  const latestProgram = programs.length > 0
+    ? [...programs].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())[0]
+    : null;
+
+  const getProgramStatus = (program: NonNullable<typeof latestProgram>) => {
+    if (!program.durationDays) return { remaining: null, isExpired: false };
+    const expiry = new Date(program.createdAt);
+    expiry.setDate(expiry.getDate() + program.durationDays);
+    const remaining = Math.ceil((expiry.getTime() - Date.now()) / 86400000);
+    return { remaining, isExpired: remaining <= 0, expiryDate: expiry.toISOString() };
+  };
 
   if (isLoading) return <EmptyState title="در حال دریافت ورزشکار..." />;
   if (isError) return <EmptyState title={getApiErrorMessage(error)} />;
@@ -150,6 +395,96 @@ export function AthleteDetailPage() {
         {deleteStudent.isError ? <p className="text-sm text-rose-600">{getApiErrorMessage(deleteStudent.error)}</p> : null}
       </Card>
 
+      {/* Active plan widgets */}
+      <div className="grid gap-3 sm:grid-cols-2">
+        {/* Training program widget */}
+        {latestProgram ? (() => {
+          const status = getProgramStatus(latestProgram);
+          return (
+            <button
+              onClick={() => setSelectedProgramId(latestProgram.id)}
+              className="group relative overflow-hidden rounded-2xl bg-surface-dark p-4 text-right text-white transition-all hover:opacity-90 active:scale-[0.98]"
+            >
+              <div className="pointer-events-none absolute -left-6 -top-6 h-24 w-24 rounded-full bg-brand-yellow/20 blur-2xl" />
+              <div className="relative flex flex-col gap-3">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <NotebookText className="h-4 w-4 text-brand-yellow" />
+                    <span className="text-xs font-bold text-white/60">برنامه تمرینی</span>
+                  </div>
+                  <ChevronLeft className="h-4 w-4 text-white/40 transition group-hover:text-white/70" />
+                </div>
+                <div>
+                  <p className="line-clamp-1 font-bold">{latestProgram.title}</p>
+                  <p className="mt-1 text-xs text-white/50">
+                    {status.remaining === null
+                      ? 'بدون تاریخ انقضا'
+                      : status.isExpired
+                        ? `منقضی شده — ${formatPersianDate(status.expiryDate!)}`
+                        : `${status.remaining} روز مانده`}
+                  </p>
+                </div>
+                <span
+                  className={`inline-flex w-fit rounded-full px-2.5 py-0.5 text-xs font-bold ${
+                    status.isExpired
+                      ? 'bg-rose-400/20 text-rose-300'
+                      : 'bg-brand-yellow/20 text-brand-yellow'
+                  }`}
+                >
+                  {status.isExpired ? 'منقضی' : 'فعال'}
+                </span>
+              </div>
+            </button>
+          );
+        })() : (
+          <Link
+            to={`/coach/athletes/${id}/new-program`}
+            className="flex flex-col items-center justify-center gap-2 rounded-2xl border-2 border-dashed border-slate-200 p-5 text-center transition hover:border-slate-300 dark:border-white/10 dark:hover:border-white/20"
+          >
+            <NotebookText className="h-7 w-7 text-slate-300 dark:text-white/20" />
+            <p className="text-sm font-semibold text-slate-500 dark:text-white/40">برنامه تمرینی ندارد</p>
+            <span className="text-xs font-bold text-brand-yellow">+ برنامه جدید</span>
+          </Link>
+        )}
+
+        {/* Nutrition widget */}
+        {nutritionPlan ? (
+          <button
+            onClick={() => setShowNutritionModal(true)}
+            className="group relative overflow-hidden rounded-2xl bg-emerald-600 p-4 text-right text-white transition-all hover:opacity-90 active:scale-[0.98]"
+          >
+            <div className="pointer-events-none absolute -left-6 -top-6 h-24 w-24 rounded-full bg-white/10 blur-2xl" />
+            <div className="relative flex flex-col gap-3">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <UtensilsCrossed className="h-4 w-4 text-emerald-200" />
+                  <span className="text-xs font-bold text-white/60">برنامه تغذیه</span>
+                </div>
+                <ChevronLeft className="h-4 w-4 text-white/40 transition group-hover:text-white/70" />
+              </div>
+              <div>
+                <p className="font-bold">{nutritionPlan.meals.length} وعده غذایی</p>
+                <p className="mt-1 text-xs text-white/50">
+                  آخرین به‌روزرسانی: {formatPersianDate(nutritionPlan.updatedAt)}
+                </p>
+              </div>
+              <span className="inline-flex w-fit rounded-full bg-white/20 px-2.5 py-0.5 text-xs font-bold text-white">
+                فعال
+              </span>
+            </div>
+          </button>
+        ) : (
+          <Link
+            to="/coach/nutrition"
+            className="flex flex-col items-center justify-center gap-2 rounded-2xl border-2 border-dashed border-slate-200 p-5 text-center transition hover:border-slate-300 dark:border-white/10 dark:hover:border-white/20"
+          >
+            <UtensilsCrossed className="h-7 w-7 text-slate-300 dark:text-white/20" />
+            <p className="text-sm font-semibold text-slate-500 dark:text-white/40">برنامه تغذیه ندارد</p>
+            <span className="text-xs font-bold text-emerald-500">+ برنامه تغذیه</span>
+          </Link>
+        )}
+      </div>
+
       <div className="space-y-3">
         <h2 className="font-bold">برنامه های قبلی</h2>
         {programs.length === 0 ? <EmptyState title="برنامه ای ثبت نشده است" /> : null}
@@ -163,7 +498,78 @@ export function AthleteDetailPage() {
           </Card>
         ))}
       </div>
+
       {editing ? <StudentForm student={student} onClose={() => setEditing(false)} /> : null}
+
+      {/* Program detail modal */}
+      {selectedProgramId ? (
+        <Modal title="جزئیات برنامه تمرینی" onClose={() => setSelectedProgramId(null)}>
+          {programDetailLoading ? (
+            <EmptyState title="در حال دریافت برنامه..." />
+          ) : !programDetail ? (
+            <EmptyState title="برنامه یافت نشد" />
+          ) : (
+            <div className="space-y-4">
+              <div>
+                <h3 className="text-lg font-black">{programDetail.title}</h3>
+                <p className="text-sm text-slate-500 dark:text-white/40">
+                  {formatPersianDate(programDetail.createdAt)}
+                  {programDetail.durationDays ? ` · اعتبار ${programDetail.durationDays} روز` : ''}
+                </p>
+              </div>
+              {programDetail.days.map((day) => (
+                <div key={day.id} className="rounded-xl border border-slate-200 p-3 dark:border-white/10">
+                  <p className="mb-2 font-bold">روز {day.dayNumber}</p>
+                  {day.blocks.map((block) => (
+                    <div key={block.id} className="mb-2 rounded-xl bg-slate-50 p-3 dark:bg-white/[0.05]">
+                      <p className="mb-2 text-xs font-bold text-brand-yellow">{blockLabels[block.type]}</p>
+                      {block.note ? <p className="mb-2 text-xs text-slate-500">{block.note}</p> : null}
+                      <div className="space-y-1.5">
+                        {block.items.map((item) => (
+                          <div key={item.id} className="flex items-center justify-between rounded-lg bg-white px-3 py-2 dark:bg-white/[0.07]">
+                            <span className="text-sm font-semibold">{item.exercise.title}</span>
+                            <span className="text-xs text-slate-500 dark:text-white/40">
+                              {item.sets} ست · {item.reps}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ))}
+            </div>
+          )}
+        </Modal>
+      ) : null}
+
+      {/* Nutrition detail modal */}
+      {showNutritionModal && nutritionPlan ? (
+        <Modal title="برنامه تغذیه" onClose={() => setShowNutritionModal(false)}>
+          <div className="space-y-3">
+            {[...nutritionPlan.meals]
+              .sort((a, b) => a.order - b.order)
+              .map((meal) => (
+                <div key={meal.id} className="rounded-xl border border-slate-200 p-3 dark:border-white/10">
+                  <div className="mb-2 flex items-center justify-between gap-2">
+                    <span className={`rounded-xl px-3 py-1 text-xs font-bold ${nutritionMealColors[meal.type]}`}>
+                      {meal.label}
+                    </span>
+                    {meal.reminderTime ? (
+                      <span className="flex items-center gap-1 text-xs text-slate-400 dark:text-white/30">
+                        <Clock className="h-3 w-3" />
+                        {meal.reminderTime}
+                      </span>
+                    ) : null}
+                  </div>
+                  <p className="whitespace-pre-line text-sm leading-7 text-slate-700 dark:text-white/70">
+                    {meal.description}
+                  </p>
+                </div>
+              ))}
+          </div>
+        </Modal>
+      ) : null}
     </section>
   );
 }
@@ -526,10 +932,12 @@ export function ExerciseManagementPage() {
   const [search, setSearch] = useState('');
   const [editing, setEditing] = useState<Exercise | null>(null);
   const [creating, setCreating] = useState(false);
-  const { data: response, isLoading, isError, error } = useExercises({ search });
+  const [confirmDelete, setConfirmDelete] = useState<Exercise | null>(null);
+  const { data, isLoading, isError, error, fetchNextPage, hasNextPage, isFetchingNextPage } = useInfiniteExercises({ search });
   const deleteExercise = useDeleteExercise();
-  const exercises = response?.data.items ?? [];
+  const exercises = data?.pages.flatMap((p) => p.data.items) ?? [];
   const canManage = user?.role === 'ADMIN' || user?.role === 'COACH';
+  const sentinelRef = useScrollSentinel(fetchNextPage, hasNextPage && !isFetchingNextPage);
 
   return (
     <section className="space-y-4">
@@ -560,11 +968,11 @@ export function ExerciseManagementPage() {
               </div>
               {canManage ? (
                 <div className="flex gap-2">
-                  <Button variant="secondary" className="h-10 w-10 px-0" onClick={() => setEditing(exercise)}>
-                    <Edit className="h-4 w-4" />
+                  <Button variant="secondary" className="h-11 w-11 px-0" onClick={() => setEditing(exercise)}>
+                    <Edit className="h-6 w-6" />
                   </Button>
-                  <Button variant="danger" className="h-10 w-10 px-0" disabled={deleteExercise.isPending} onClick={() => deleteExercise.mutate(exercise.id)}>
-                    <Trash2 className="h-4 w-4" />
+                  <Button variant="danger" className="h-11 w-11 px-0" onClick={() => setConfirmDelete(exercise)}>
+                    <Trash2 className="h-6 w-6" />
                   </Button>
                 </div>
               ) : null}
@@ -572,10 +980,33 @@ export function ExerciseManagementPage() {
           </Card>
         ))}
       </div>
+      <div ref={sentinelRef} />
+      {isFetchingNextPage ? <ScrollLoader /> : null}
       {deleteExercise.isError ? <p className="text-sm text-rose-600">{getApiErrorMessage(deleteExercise.error)}</p> : null}
       {deleteExercise.data?.message ? <p className="text-sm text-emerald-600">{deleteExercise.data.message}</p> : null}
       {creating ? <ExerciseForm onClose={() => setCreating(false)} /> : null}
       {editing ? <ExerciseForm exercise={editing} onClose={() => setEditing(null)} /> : null}
+      {confirmDelete ? (
+        <Modal title="حذف حرکت" onClose={() => setConfirmDelete(null)}>
+          <p className="mb-5 text-slate-600 dark:text-white/60">
+            آیا از حذف حرکت <span className="font-bold text-slate-800 dark:text-white">«{confirmDelete.title}»</span> مطمئن هستید؟ این عمل قابل بازگشت نیست.
+          </p>
+          {deleteExercise.isError ? <p className="mb-3 text-sm text-rose-600">{getApiErrorMessage(deleteExercise.error)}</p> : null}
+          <div className="flex flex-col gap-2 sm:flex-row">
+            <Button
+              variant="danger"
+              className="flex-1"
+              disabled={deleteExercise.isPending}
+              onClick={() => deleteExercise.mutate(confirmDelete.id, { onSuccess: () => setConfirmDelete(null) })}
+            >
+              {deleteExercise.isPending ? 'در حال حذف...' : 'بله، حذف شود'}
+            </Button>
+            <Button type="button" variant="ghost" onClick={() => setConfirmDelete(null)}>
+              انصراف
+            </Button>
+          </div>
+        </Modal>
+      ) : null}
     </section>
   );
 }
@@ -584,11 +1015,14 @@ function ExerciseForm({ exercise, onClose }: { exercise?: Exercise; onClose: () 
   const createExercise = useCreateExercise();
   const updateExercise = useUpdateExercise();
   const uploadVideo = useUploadVideo();
+  const uploadImage = useUploadImage();
   const [form, setForm] = useState<CreateExerciseRequest>({
     title: exercise?.title ?? '',
     description: exercise?.description ?? '',
     videoUrl: exercise?.videoUrl ?? '',
     thumbnailUrl: exercise?.thumbnailUrl ?? '',
+    imageUrl: exercise?.imageUrl ?? '',
+    muscleGroup: exercise?.muscleGroup ?? undefined,
   });
   const mutation = exercise ? updateExercise : createExercise;
 
@@ -597,22 +1031,21 @@ function ExerciseForm({ exercise, onClose }: { exercise?: Exercise; onClose: () 
     description: form.description?.trim() || undefined,
     videoUrl: form.videoUrl?.trim() || undefined,
     thumbnailUrl: form.thumbnailUrl?.trim() || undefined,
+    imageUrl: form.imageUrl?.trim() || undefined,
+    muscleGroup: form.muscleGroup || undefined,
   });
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-
     if (exercise) {
       updateExercise.mutate({ id: exercise.id, payload: toPayload() }, { onSuccess: onClose });
       return;
     }
-
     createExercise.mutate(toPayload(), { onSuccess: onClose });
   };
 
-  const handleFileChange = (file?: File) => {
+  const handleVideoChange = (file?: File) => {
     if (!file) return;
-
     uploadVideo.mutate(file, {
       onSuccess: (response) => {
         setForm((current) => ({
@@ -624,26 +1057,56 @@ function ExerciseForm({ exercise, onClose }: { exercise?: Exercise; onClose: () 
     });
   };
 
+  const handleImageChange = (file?: File) => {
+    if (!file) return;
+    uploadImage.mutate(file, {
+      onSuccess: (response) => {
+        setForm((current) => ({ ...current, imageUrl: response.data.url }));
+      },
+    });
+  };
+
+  const isUploading = uploadVideo.isPending || uploadImage.isPending;
+
   return (
     <Modal title={exercise ? 'ویرایش حرکت' : 'افزودن حرکت'} onClose={onClose}>
       <form className="space-y-3" onSubmit={handleSubmit}>
         <Input placeholder="نام حرکت" value={form.title} onChange={(event) => setForm({ ...form, title: event.target.value })} required />
-        <Input placeholder="آدرس ویدیو" value={form.videoUrl} onChange={(event) => setForm({ ...form, videoUrl: event.target.value })} />
-        <Input placeholder="آدرس تصویر بندانگشتی" value={form.thumbnailUrl} onChange={(event) => setForm({ ...form, thumbnailUrl: event.target.value })} />
-        <input
-          className="block w-full text-sm text-slate-500 dark:text-white/40 file:ml-3 file:rounded-xl file:border-0 file:bg-slate-100 file:px-4 file:py-3 file:text-sm file:font-bold dark:file:bg-white/[0.07] dark:file:text-white"
-          type="file"
-          accept="video/*"
-          onChange={(event) => handleFileChange(event.target.files?.[0])}
-        />
-        {uploadVideo.isPending ? <p className="text-sm text-slate-500">در حال آپلود ویدیو...</p> : null}
-        {uploadVideo.isError ? <p className="text-sm text-rose-600">{getApiErrorMessage(uploadVideo.error)}</p> : null}
-        {uploadVideo.data?.message ? <p className="text-sm text-emerald-600">{uploadVideo.data.message}</p> : null}
+        <Select value={form.muscleGroup ?? ''} onChange={(event) => setForm({ ...form, muscleGroup: (event.target.value as MuscleGroup) || undefined })}>
+          <option value="">عضله هدف را انتخاب کنید</option>
+          {(Object.keys(muscleGroupLabels) as MuscleGroup[]).map((key) => (
+            <option key={key} value={key}>{muscleGroupLabels[key]}</option>
+          ))}
+        </Select>
+        <div className="space-y-1">
+          <p className="text-sm font-medium text-slate-600 dark:text-white/60">ویدیو حرکت</p>
+          <Input placeholder="آدرس ویدیو" value={form.videoUrl} onChange={(event) => setForm({ ...form, videoUrl: event.target.value })} />
+          <input
+            className="block w-full text-sm text-slate-500 dark:text-white/40 file:ml-3 file:rounded-xl file:border-0 file:bg-slate-100 file:px-4 file:py-3 file:text-sm file:font-bold dark:file:bg-white/[0.07] dark:file:text-white"
+            type="file"
+            accept="video/*"
+            onChange={(event) => handleVideoChange(event.target.files?.[0])}
+          />
+          {uploadVideo.isPending ? <p className="text-sm text-slate-500">در حال آپلود ویدیو...</p> : null}
+          {uploadVideo.isError ? <p className="text-sm text-rose-600">{getApiErrorMessage(uploadVideo.error)}</p> : null}
+        </div>
+        <div className="space-y-1">
+          <p className="text-sm font-medium text-slate-600 dark:text-white/60">تصویر حرکت</p>
+          <Input placeholder="آدرس تصویر" value={form.imageUrl} onChange={(event) => setForm({ ...form, imageUrl: event.target.value })} />
+          <input
+            className="block w-full text-sm text-slate-500 dark:text-white/40 file:ml-3 file:rounded-xl file:border-0 file:bg-slate-100 file:px-4 file:py-3 file:text-sm file:font-bold dark:file:bg-white/[0.07] dark:file:text-white"
+            type="file"
+            accept="image/*"
+            onChange={(event) => handleImageChange(event.target.files?.[0])}
+          />
+          {uploadImage.isPending ? <p className="text-sm text-slate-500">در حال آپلود تصویر...</p> : null}
+          {uploadImage.isError ? <p className="text-sm text-rose-600">{getApiErrorMessage(uploadImage.error)}</p> : null}
+        </div>
         <Textarea rows={4} placeholder="توضیحات حرکت" value={form.description} onChange={(event) => setForm({ ...form, description: event.target.value })} />
         {mutation.isError ? <p className="text-sm text-rose-600">{getApiErrorMessage(mutation.error)}</p> : null}
         {mutation.data?.message ? <p className="text-sm text-emerald-600">{mutation.data.message}</p> : null}
         <div className="flex flex-col gap-2 sm:flex-row">
-          <Button className="flex-1" disabled={mutation.isPending || uploadVideo.isPending || !form.title.trim()}>
+          <Button className="flex-1" disabled={mutation.isPending || isUploading || !form.title.trim()}>
             {mutation.isPending ? 'در حال ذخیره...' : 'ذخیره'}
           </Button>
           <Button type="button" variant="ghost" onClick={onClose}>
@@ -711,6 +1174,320 @@ function AnswerQuestionForm({ id }: { id: string }) {
         {answerQuestion.isPending ? 'در حال ارسال...' : 'ارسال پاسخ'}
       </Button>
     </form>
+  );
+}
+
+// ─── Nutrition Plan Page ──────────────────────────────────────────────────────
+
+type NutritionMealDraft = {
+  type: MealType;
+  label: string;
+  description: string;
+  order: number;
+};
+
+type NutritionStep = 'setup' | 'fill' | 'preview';
+
+const PERSIAN_DIGITS = ['۰', '۱', '۲', '۳', '۴', '۵', '۶', '۷', '۸', '۹'];
+const toPersianNum = (n: number) =>
+  String(n)
+    .split('')
+    .map((d) => PERSIAN_DIGITS[+d])
+    .join('');
+
+const MAIN_MEALS = [
+  { key: 'breakfast' as const, label: 'صبحانه', type: 'BREAKFAST' as MealType },
+  { key: 'lunch' as const, label: 'ناهار', type: 'LUNCH' as MealType },
+  { key: 'dinner' as const, label: 'شام', type: 'DINNER' as MealType },
+];
+
+type SelectedMeals = { breakfast: boolean; lunch: boolean; dinner: boolean };
+
+function buildMeals(selected: SelectedMeals, snackCounts: Record<string, number>): NutritionMealDraft[] {
+  const active = MAIN_MEALS.filter((m) => selected[m.key]);
+  const result: Omit<NutritionMealDraft, 'order'>[] = [];
+  let snackCounter = 0;
+
+  for (let i = 0; i < active.length; i++) {
+    result.push({ type: active[i].type, label: active[i].label, description: '' });
+    if (i < active.length - 1) {
+      const gapKey = `${active[i].key}-${active[i + 1].key}`;
+      const count = snackCounts[gapKey] ?? 0;
+      for (let j = 0; j < count; j++) {
+        snackCounter++;
+        result.push({ type: 'SNACK', label: `میان‌وعده ${toPersianNum(snackCounter)}`, description: '' });
+      }
+    }
+  }
+
+  return result.map((m, i) => ({ ...m, order: i + 1 }));
+}
+
+const nutritionMealColors: Record<MealType, string> = {
+  BREAKFAST: 'bg-orange-100 text-orange-700 dark:bg-orange-400/10 dark:text-orange-400',
+  LUNCH: 'bg-amber-100 text-amber-700 dark:bg-amber-400/10 dark:text-amber-400',
+  DINNER: 'bg-indigo-100 text-indigo-700 dark:bg-indigo-400/10 dark:text-indigo-400',
+  SNACK: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-400/10 dark:text-emerald-400',
+};
+
+const STEP_LABELS = ['انتخاب وعده‌ها', 'محتوای وعده‌ها', 'پیش‌نمایش'] as const;
+const stepIndex = (step: NutritionStep) => (step === 'setup' ? 0 : step === 'fill' ? 1 : 2);
+
+export function NutritionPlanPage() {
+  const [step, setStep] = useState<NutritionStep>('setup');
+  const [studentId, setStudentId] = useState('');
+  const [selected, setSelected] = useState<SelectedMeals>({ breakfast: true, lunch: true, dinner: true });
+  const [snackCounts, setSnackCounts] = useState<Record<string, number>>({});
+  const [meals, setMeals] = useState<NutritionMealDraft[]>([]);
+  const [done, setDone] = useState(false);
+
+  const { data: studentsRes } = useStudents({ limit: 100 });
+  const students = studentsRes?.data.items ?? [];
+  const { mutate: create, isPending, isError, error } = useCreateNutritionPlan();
+
+  const activeMeals = MAIN_MEALS.filter((m) => selected[m.key]);
+  const gaps = activeMeals.slice(0, -1).map((m, i) => ({
+    key: `${m.key}-${activeMeals[i + 1].key}`,
+    label: `میان‌وعده بین ${m.label} و ${activeMeals[i + 1].label}`,
+  }));
+
+  const goToFill = () => {
+    setMeals(buildMeals(selected, snackCounts));
+    setStep('fill');
+  };
+
+  const submit = () => {
+    const payload: CreateNutritionMealRequest[] = meals.map(({ type, label, description, order }) => ({
+      type,
+      label,
+      description,
+      order,
+    }));
+    create({ studentId, meals: payload }, { onSuccess: () => setDone(true) });
+  };
+
+  const resetForm = () => {
+    setDone(false);
+    setStep('setup');
+    setStudentId('');
+    setSelected({ breakfast: true, lunch: true, dinner: true });
+    setSnackCounts({});
+    setMeals([]);
+  };
+
+  if (done) {
+    return (
+      <section className="space-y-4">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+          className="flex flex-col items-center gap-4 rounded-2xl border border-emerald-200 bg-emerald-50 p-8 text-center dark:border-emerald-400/20 dark:bg-emerald-400/[0.06]"
+        >
+          <CheckCircle2 className="h-12 w-12 text-emerald-500" />
+          <div>
+            <h2 className="text-xl font-black text-emerald-800 dark:text-emerald-300">برنامه تغذیه ثبت شد</h2>
+            <p className="mt-1 text-sm text-emerald-600 dark:text-emerald-400">برنامه غذایی با موفقیت برای ورزشکار ایجاد شد.</p>
+          </div>
+          <div className="flex gap-3">
+            <Link to={`/coach/athletes/${studentId}`}>
+              <Button variant="secondary">پروفایل ورزشکار</Button>
+            </Link>
+            <Button onClick={resetForm}>برنامه جدید</Button>
+          </div>
+        </motion.div>
+      </section>
+    );
+  }
+
+  const idx = stepIndex(step);
+
+  return (
+    <section className="space-y-5">
+      <div>
+        <h1 className="text-2xl font-black">ایجاد برنامه تغذیه</h1>
+        <p className="text-sm text-slate-500 dark:text-white/40">برنامه غذایی اختصاصی برای ورزشکار بسازید.</p>
+      </div>
+
+      {/* Step indicator */}
+      <div className="flex items-center gap-1">
+        {STEP_LABELS.map((label, i) => (
+          <div key={i} className="flex items-center gap-1">
+            <div
+              className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs font-bold transition-colors ${
+                i < idx
+                  ? 'bg-surface-dark text-white dark:bg-brand-yellow dark:text-surface-dark'
+                  : i === idx
+                    ? 'bg-surface-dark text-white dark:bg-brand-yellow dark:text-surface-dark'
+                    : 'bg-slate-200 text-slate-500 dark:bg-white/10 dark:text-white/40'
+              }`}
+            >
+              {i < idx ? <Check className="h-3.5 w-3.5" /> : toPersianNum(i + 1)}
+            </div>
+            <span
+              className={`hidden text-xs font-semibold sm:block ${
+                i === idx ? 'text-slate-800 dark:text-white' : 'text-slate-400 dark:text-white/40'
+              }`}
+            >
+              {label}
+            </span>
+            {i < STEP_LABELS.length - 1 ? (
+              <div className={`mx-1 h-px w-6 shrink-0 sm:w-10 ${i < idx ? 'bg-surface-dark dark:bg-brand-yellow' : 'bg-slate-200 dark:bg-white/10'}`} />
+            ) : null}
+          </div>
+        ))}
+      </div>
+
+      {/* Step 1: Setup */}
+      {step === 'setup' ? (
+        <Card className="space-y-5">
+          <div className="space-y-2">
+            <label className="block text-sm font-bold">ورزشکار</label>
+            <Select value={studentId} onChange={(e) => setStudentId(e.target.value)}>
+              <option value="">انتخاب ورزشکار</option>
+              {students.map((s) => (
+                <option key={s.id} value={s.id}>
+                  {s.fullName} ({s.phone})
+                </option>
+              ))}
+            </Select>
+          </div>
+
+          <div className="space-y-3">
+            <label className="block text-sm font-bold">وعده‌های اصلی</label>
+            <div className="flex gap-3">
+              {MAIN_MEALS.map(({ key, label }) => (
+                <button
+                  key={key}
+                  type="button"
+                  onClick={() => setSelected((prev) => ({ ...prev, [key]: !prev[key] }))}
+                  className={`flex-1 rounded-xl border py-3 text-sm font-bold transition-all duration-200 ${
+                    selected[key]
+                      ? 'border-surface-dark bg-surface-dark text-white dark:border-brand-yellow dark:bg-brand-yellow dark:text-surface-dark'
+                      : 'border-slate-200 bg-white/80 text-slate-600 hover:border-slate-300 dark:border-white/10 dark:bg-white/[0.05] dark:text-white/60'
+                  }`}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {gaps.map((gap) => (
+            <NutritionSnackPicker
+              key={gap.key}
+              label={gap.label}
+              value={snackCounts[gap.key] ?? 0}
+              onChange={(n) => setSnackCounts((prev) => ({ ...prev, [gap.key]: n }))}
+            />
+          ))}
+
+          <Button
+            className="w-full"
+            disabled={!studentId || activeMeals.length === 0}
+            onClick={goToFill}
+          >
+            مرحله بعد
+            <ChevronLeft className="h-4 w-4" />
+          </Button>
+        </Card>
+      ) : null}
+
+      {/* Step 2: Fill descriptions */}
+      {step === 'fill' ? (
+        <div className="space-y-4">
+          {meals.map((meal, i) => (
+            <Card key={i} className="space-y-3">
+              <span className={`inline-flex rounded-xl px-3 py-1 text-xs font-bold ${nutritionMealColors[meal.type]}`}>
+                {meal.label}
+              </span>
+              <Textarea
+                rows={4}
+                placeholder={`محتوای ${meal.label} را وارد کنید...`}
+                value={meal.description}
+                onChange={(e) => {
+                  const updated = [...meals];
+                  updated[i] = { ...meal, description: e.target.value };
+                  setMeals(updated);
+                }}
+              />
+            </Card>
+          ))}
+          <div className="flex gap-2">
+            <Button variant="secondary" onClick={() => setStep('setup')}>
+              <ChevronRight className="h-4 w-4" />
+              قبلی
+            </Button>
+            <Button
+              className="flex-1"
+              disabled={meals.some((m) => !m.description.trim())}
+              onClick={() => setStep('preview')}
+            >
+              پیش‌نمایش
+              <ChevronLeft className="h-4 w-4" />
+            </Button>
+          </div>
+        </div>
+      ) : null}
+
+      {/* Step 3: Preview */}
+      {step === 'preview' ? (
+        <div className="space-y-4">
+          <div className="space-y-3">
+            {meals.map((meal, i) => (
+              <Card key={i} className="space-y-2">
+                <span className={`inline-flex rounded-xl px-3 py-1 text-xs font-bold ${nutritionMealColors[meal.type]}`}>
+                  {meal.label}
+                </span>
+                <p className="whitespace-pre-line text-sm leading-7 text-slate-700 dark:text-white/70">{meal.description}</p>
+              </Card>
+            ))}
+          </div>
+          {isError ? <p className="text-sm text-rose-600">{getApiErrorMessage(error)}</p> : null}
+          <div className="flex gap-2">
+            <Button variant="secondary" onClick={() => setStep('fill')}>
+              <ChevronRight className="h-4 w-4" />
+              ویرایش
+            </Button>
+            <Button className="flex-1" disabled={isPending} onClick={submit}>
+              {isPending ? 'در حال ثبت...' : 'تأیید و ثبت برنامه'}
+            </Button>
+          </div>
+        </div>
+      ) : null}
+    </section>
+  );
+}
+
+function NutritionSnackPicker({
+  label,
+  value,
+  onChange,
+}: {
+  label: string;
+  value: number;
+  onChange: (n: number) => void;
+}) {
+  return (
+    <div className="space-y-2">
+      <label className="block text-sm font-bold">{label}</label>
+      <div className="flex gap-2">
+        {[0, 1, 2, 3].map((n) => (
+          <button
+            key={n}
+            type="button"
+            onClick={() => onChange(n)}
+            className={`h-10 flex-1 rounded-xl border text-sm font-bold transition-all duration-200 ${
+              value === n
+                ? 'border-surface-dark bg-surface-dark text-white dark:border-brand-yellow dark:bg-brand-yellow dark:text-surface-dark'
+                : 'border-slate-200 bg-white/80 text-slate-600 hover:border-slate-300 dark:border-white/10 dark:bg-white/[0.05] dark:text-white/60'
+            }`}
+          >
+            {toPersianNum(n)}
+          </button>
+        ))}
+      </div>
+    </div>
   );
 }
 

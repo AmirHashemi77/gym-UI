@@ -153,3 +153,11 @@ export function EmptyState({ title, caption }: { title: string; caption?: string
     </motion.div>
   );
 }
+
+export function ScrollLoader() {
+  return (
+    <div className="flex justify-center py-5">
+      <div className="h-5 w-5 animate-spin rounded-full border-2 border-slate-300 border-t-surface-dark dark:border-white/20 dark:border-t-brand-yellow" />
+    </div>
+  );
+}
