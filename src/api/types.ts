@@ -392,3 +392,30 @@ export type PushSubscriptionBody = {
     auth: string;
   };
 };
+
+export type FoodCategory = {
+  id: string;
+  name: string;
+  categoryId: string;
+  order: number;
+};
+
+export type Food = {
+  id: string;
+  name: string;
+  nameEn: string;
+  image: string | null;
+  servingAmount: number;
+  servingUnit: string;
+  calories: number;
+  proteinG: number;
+  carbohydrateG: number;
+  fatG: number;
+  fiberG: number;
+  sugarG: number;
+  sodiumMg: number;
+  source: string;
+  verified: boolean;
+  categoryId: string;
+  category?: FoodCategory;
+};

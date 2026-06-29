@@ -1,5 +1,5 @@
 import { type ReactNode } from 'react';
-import { Bell, Dumbbell, Home, LogOut, MessageSquare, NotebookText, Search, UtensilsCrossed, Users } from 'lucide-react';
+import { Bell, BookOpen, Dumbbell, Home, LogOut, MessageSquare, NotebookText, Search, UtensilsCrossed, Users } from 'lucide-react';
 import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useLogout } from '../hooks/auth';
@@ -33,6 +33,7 @@ export function ProtectedLayout() {
     { to: '/athlete/programs', label: 'برنامه ها', icon: NotebookText },
     { to: '/athlete/nutrition', label: 'تغذیه', icon: UtensilsCrossed },
     { to: '/athlete/questions', label: 'سوال ها', icon: MessageSquare },
+    { to: '/athlete/foods', label: 'بانک غذایی', icon: BookOpen, sidebarOnly: true },
   ];
 
   const coachLinks = [
@@ -99,7 +100,7 @@ export function ProtectedLayout() {
 
       <nav className="fixed inset-x-0 bottom-6 z-40 flex justify-center md:hidden">
         <div className="flex items-center gap-1.5 rounded-full border border-white/15 bg-surface-dark/40 px-2.5 py-2 shadow-xl shadow-black/30 backdrop-blur-2xl">
-          {links.map((item) => (
+          {links.filter((item) => !('sidebarOnly' in item && item.sidebarOnly)).map((item) => (
             <BottomNavItem key={item.to} {...item} />
           ))}
         </div>

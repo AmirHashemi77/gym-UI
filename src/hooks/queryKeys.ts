@@ -36,4 +36,11 @@ export const queryKeys = {
     myPlan: ['nutrition', 'my-plan'] as const,
     studentPlan: (studentId: string) => ['nutrition', 'student-plan', studentId] as const,
   },
+  foods: {
+    all: ['foods'] as const,
+    categories: ['foods', 'categories'] as const,
+    byCategory: (categoryId: string) => ['foods', 'category', categoryId] as const,
+    detail: (id: string) => ['foods', 'detail', id] as const,
+    search: (query: string) => ['foods', 'search', query] as const,
+  },
 };

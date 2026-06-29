@@ -7,3 +7,4 @@ export * from './questions';
 export * from './upload';
 export * from './notifications';
 export * from './nutrition';
+export * from './foods';

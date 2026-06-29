@@ -3,6 +3,7 @@ import { ProtectedLayout } from './components/Layout';
 import { AthleteHomePage, ExerciseDetailPage, ExerciseSearchPage, MyProgramsPage, MyQuestionsPage, NutritionPage, ProgramDetailPage } from './pages/AthletePages';
 import { LandingPage, LoginPage, StudentRegisterPage } from './pages/AuthPages';
 import { AthleteDetailPage, AthletesPage, CoachHomePage, ExerciseManagementPage, NewProgramPage, NotificationsPage, NutritionPlanPage, QuestionsManagementPage } from './pages/CoachPages';
+import { FoodCategoriesPage, FoodDetailPage, FoodListPage } from './pages/FoodDatabasePages';
 import { ForbiddenPage, ProtectedRoute, RoleGuard } from './features/auth';
 
 export function App() {
@@ -24,6 +25,9 @@ export function App() {
             <Route path="questions" element={<MyQuestionsPage />} />
             <Route path="programs" element={<MyProgramsPage />} />
             <Route path="programs/:id" element={<ProgramDetailPage />} />
+            <Route path="foods" element={<FoodCategoriesPage />} />
+            <Route path="foods/:categoryId" element={<FoodListPage />} />
+            <Route path="foods/:categoryId/:foodId" element={<FoodDetailPage />} />
           </Route>
         </Route>
 

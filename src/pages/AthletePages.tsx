@@ -1,4 +1,4 @@
-import { Activity, Bell, Bookmark, BookmarkCheck, CheckCircle2, ChevronLeft, Clock, Dumbbell, Heart, MessageCircle, NotebookText, Play, Search, UtensilsCrossed, Waves, Zap } from "lucide-react";
+import { Activity, Bell, Bookmark, BookmarkCheck, BookOpen, CheckCircle2, ChevronLeft, Clock, Dumbbell, Heart, MessageCircle, NotebookText, Play, Search, UtensilsCrossed, Waves, Zap } from "lucide-react";
 import { motion } from "framer-motion";
 import { FormEvent, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
@@ -7,6 +7,7 @@ import { notificationsService } from "../api/notifications.service";
 import type { MealType, NutritionMeal, NutritionPlan, Program } from "../api/types";
 import { requestNotificationPermission, subscribeToPush } from "../services/pushNotification";
 import { Button, Card, EmptyState, ScrollLoader, SearchBox, Textarea } from "../components/ui";
+import { HomeFoodCategoriesWidget } from "./FoodDatabasePages";
 import { useAuth } from "../features/auth";
 import { useBookmarkExercise, useExercise, useInfiniteExercises, useUnbookmarkExercise } from "../hooks/exercises";
 import { useMyNutritionPlan, useUpdateMealReminder } from "../hooks/nutrition";
@@ -97,6 +98,18 @@ export function AthleteHomePage() {
 
       {/* Nutrition plan */}
       {nutritionPlan ? <NutritionPlanHomeCard plan={nutritionPlan} /> : null}
+
+      {/* Food database */}
+      <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.35, delay: 0.35, ease: [0.16, 1, 0.3, 1] }}>
+        <div className="mb-3 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <BookOpen className="h-4 w-4 text-teal-600 dark:text-teal-400" />
+            <h2 className="font-bold">بانک غذایی</h2>
+          </div>
+          <Link to="/athlete/foods" className="text-xs font-semibold text-teal-600 dark:text-teal-400">مشاهده همه</Link>
+        </div>
+        <HomeFoodCategoriesWidget />
+      </motion.div>
     </section>
   );
 }
