@@ -93,14 +93,8 @@ export function AthleteHomePage() {
         />
       ) : <NoProgramCard />)}
 
-      {/* Active program detail */}
-      {activeProgram ? <ActiveProgramHomeCard program={activeProgram} /> : null}
-
-      {/* Nutrition plan */}
-      {nutritionPlan ? <NutritionPlanHomeCard plan={nutritionPlan} /> : null}
-
       {/* Food database */}
-      <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.35, delay: 0.35, ease: [0.16, 1, 0.3, 1] }}>
+      <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.35, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}>
         <div className="mb-3 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <BookOpen className="h-4 w-4 text-teal-600 dark:text-teal-400" />
@@ -110,6 +104,12 @@ export function AthleteHomePage() {
         </div>
         <HomeFoodCategoriesWidget />
       </motion.div>
+
+      {/* Active program detail */}
+      {activeProgram ? <ActiveProgramHomeCard program={activeProgram} /> : null}
+
+      {/* Nutrition plan */}
+      {nutritionPlan ? <NutritionPlanHomeCard plan={nutritionPlan} /> : null}
     </section>
   );
 }
@@ -396,8 +396,8 @@ export function ExerciseDetailPage() {
             <p className="text-sm text-slate-500 dark:text-white/40">{exercise.slug}</p>
           </div>
           {user?.role === "STUDENT" ? (
-            <Button variant="secondary" className="h-11 w-11 px-0" disabled={bookmarkExercise.isPending || unbookmarkExercise.isPending} onClick={handleBookmark}>
-              {bookmarked ? <BookmarkCheck className="h-5 w-5 text-green-700 dark:text-brand-yellow" /> : <Bookmark className="h-5 w-5" />}
+            <Button variant="secondary" className="h-12 w-12 px-0" disabled={bookmarkExercise.isPending || unbookmarkExercise.isPending} onClick={handleBookmark}>
+              {bookmarked ? <BookmarkCheck className="h-7 w-7 text-green-700 dark:text-brand-yellow" /> : <Bookmark className="h-7 w-7" />}
             </Button>
           ) : null}
         </div>
@@ -405,7 +405,7 @@ export function ExerciseDetailPage() {
           isGif ? (
             <img src={mediaUrl} alt={exercise.title} className="w-full rounded-xl object-cover" />
           ) : (
-            <video className="aspect-video w-full rounded-xl bg-slate-950 dark:bg-surface-dark object-cover" src={mediaUrl} controls poster={getMediaUrl(exercise.thumbnailUrl) ?? undefined} />
+            <video className="aspect-video w-full rounded-xl bg-slate-950 dark:bg-surface-dark object-contain" src={mediaUrl} controls poster={getMediaUrl(exercise.thumbnailUrl) ?? undefined} />
           )
         ) : null}
         {exercise.description ? <p className="leading-8 text-slate-700 dark:text-white/70">{exercise.description}</p> : null}

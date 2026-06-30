@@ -6,7 +6,13 @@ import { App } from './App';
 import { AuthProvider } from './features/auth';
 import './styles.css';
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      refetchOnWindowFocus: false,
+    },
+  },
+});
 
 function ThemeSync({ children }: { children: React.ReactNode }) {
   React.useEffect(() => {
