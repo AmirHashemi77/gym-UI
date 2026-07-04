@@ -37,6 +37,12 @@ export type PaginationQuery = {
   search?: string;
   sortBy?: string;
   sortOrder?: 'asc' | 'desc';
+  muscleGroup?: MuscleGroup;
+};
+
+export type MuscleGroupStat = {
+  muscleGroup: MuscleGroup;
+  count: number;
 };
 
 export type PaginatedResponse<T> = {

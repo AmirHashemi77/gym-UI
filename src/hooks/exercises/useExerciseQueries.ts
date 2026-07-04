@@ -78,3 +78,10 @@ export const usePopularExercises = (limit = 4) =>
     queryKey: queryKeys.exercises.popular(limit),
     queryFn: () => exercisesService.getPopular(limit),
   });
+
+export const useMuscleGroups = () =>
+  useQuery({
+    queryKey: queryKeys.exercises.muscleGroups,
+    queryFn: () => exercisesService.getMuscleGroups(),
+    staleTime: 10 * 60 * 1000,
+  });

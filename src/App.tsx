@@ -1,6 +1,6 @@
 import { Route, Routes, Navigate } from 'react-router-dom';
 import { ProtectedLayout } from './components/Layout';
-import { AthleteHomePage, ExerciseDetailPage, ExerciseSearchPage, MyProgramsPage, MyQuestionsPage, NutritionPage, ProgramDetailPage } from './pages/AthletePages';
+import { AthleteHomePage, ExerciseDetailPage, ExercisesByMuscleGroupPage, ExerciseSearchPage, MyProgramsPage, MyQuestionsPage, NutritionPage, ProgramDetailPage } from './pages/AthletePages';
 import { LandingPage, LoginPage, StudentRegisterPage } from './pages/AuthPages';
 import { AthleteDetailPage, AthletesPage, CoachHomePage, ExerciseManagementPage, NewProgramPage, NotificationsPage, NutritionPlanPage, QuestionsManagementPage } from './pages/CoachPages';
 import { FoodCategoriesPage, FoodDetailPage, FoodListPage } from './pages/FoodDatabasePages';
@@ -20,6 +20,7 @@ export function App() {
           <Route path="/athlete" element={<ProtectedLayout />}>
             <Route index element={<AthleteHomePage />} />
             <Route path="exercises" element={<ExerciseSearchPage />} />
+            <Route path="exercises/muscle-group/:muscleGroup" element={<ExercisesByMuscleGroupPage />} />
             <Route path="exercises/:id" element={<ExerciseDetailPage />} />
             <Route path="nutrition" element={<NutritionPage />} />
             <Route path="questions" element={<MyQuestionsPage />} />

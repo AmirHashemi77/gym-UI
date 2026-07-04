@@ -4,6 +4,7 @@ import type {
   CreateExerciseRequest,
   Exercise,
   ExerciseBookmark,
+  MuscleGroupStat,
   PaginatedResponse,
   PaginationQuery,
   UpdateExerciseRequest,
@@ -47,6 +48,11 @@ export const exercisesService = {
 
   getPopular: async (limit = 4): Promise<ApiResponse<Exercise[]>> => {
     const response = await http.get<ApiResponse<Exercise[]>>('/exercises/popular', { params: { limit } });
+    return unwrapResponse(response);
+  },
+
+  getMuscleGroups: async (): Promise<ApiResponse<MuscleGroupStat[]>> => {
+    const response = await http.get<ApiResponse<MuscleGroupStat[]>>('/exercises/muscle-groups');
     return unwrapResponse(response);
   },
 };

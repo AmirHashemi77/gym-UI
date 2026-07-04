@@ -19,6 +19,7 @@ export const queryKeys = {
     infinite: (query?: PaginationQuery) => ['exercises', 'infinite', query ?? {}] as const,
     detail: (id: string) => ['exercises', 'detail', id] as const,
     popular: (limit: number) => ['exercises', 'popular', limit] as const,
+    muscleGroups: ['exercises', 'muscle-groups'] as const,
   },
   programs: {
     all: ['programs'] as const,

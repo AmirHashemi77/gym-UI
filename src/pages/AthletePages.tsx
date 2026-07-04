@@ -1,15 +1,15 @@
-import { Activity, Bell, Bookmark, BookmarkCheck, BookOpen, CheckCircle2, ChevronLeft, Clock, Dumbbell, Heart, MessageCircle, NotebookText, Play, Search, UtensilsCrossed, Waves, Zap } from "lucide-react";
+import { Activity, Bell, Bookmark, BookmarkCheck, BookOpen, CheckCircle2, ChevronLeft, Clock, Dumbbell, Heart, type LucideIcon, MessageCircle, NotebookText, Play, Search, Target, UtensilsCrossed, User, Waves, Zap } from "lucide-react";
 import { motion } from "framer-motion";
 import { FormEvent, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { getApiErrorMessage, getMediaUrl } from "../api/http";
 import { notificationsService } from "../api/notifications.service";
-import type { MealType, NutritionMeal, NutritionPlan, Program } from "../api/types";
+import type { MealType, MuscleGroup, NutritionMeal, NutritionPlan, Program } from "../api/types";
 import { requestNotificationPermission, subscribeToPush } from "../services/pushNotification";
 import { Button, Card, EmptyState, ScrollLoader, SearchBox, Textarea } from "../components/ui";
 import { HomeFoodCategoriesWidget } from "./FoodDatabasePages";
 import { useAuth } from "../features/auth";
-import { useBookmarkExercise, useExercise, useInfiniteExercises, useUnbookmarkExercise } from "../hooks/exercises";
+import { useBookmarkExercise, useExercise, useInfiniteExercises, useMuscleGroups, useUnbookmarkExercise } from "../hooks/exercises";
 import { useMyNutritionPlan, useUpdateMealReminder } from "../hooks/nutrition";
 import { useScrollSentinel } from "../hooks/useScrollSentinel";
 import { useActiveProgramStats, useProgram, usePrograms } from "../hooks/programs";
@@ -17,20 +17,32 @@ import { useCreateQuestion, useQuestions } from "../hooks/questions";
 import { formatPersianDate } from "../utils/date";
 import { truncateText } from "../utils/text";
 
-// ─── Home Page ────────────────────────────────────────────────────────────────
+// ─── Muscle Group Meta ────────────────────────────────────────────────────────
 
-const HOME_CATEGORIES = [
-  { label: "کاردیو", icon: Activity, className: "bg-orange-500/15 text-orange-400" },
-  { label: "قدرتی", icon: Dumbbell, className: "bg-blue-500/15 text-blue-400" },
-  { label: "هایت", icon: Zap, className: "bg-yellow-500/15 text-yellow-400" },
-  { label: "یوگا", icon: Heart, className: "bg-pink-500/15 text-pink-400" },
-  { label: "کشش", icon: Waves, className: "bg-cyan-500/15 text-cyan-400" },
-] as const;
+const MUSCLE_GROUP_META: Record<MuscleGroup, { label: string; icon: LucideIcon; className: string }> = {
+  CHEST:      { label: 'سینه',       icon: Dumbbell,  className: 'bg-blue-500/15 text-blue-400' },
+  BACK:       { label: 'پشت',        icon: Waves,     className: 'bg-indigo-500/15 text-indigo-400' },
+  SHOULDERS:  { label: 'شانه',       icon: Zap,       className: 'bg-violet-500/15 text-violet-400' },
+  BICEPS:     { label: 'جلو بازو',   icon: Dumbbell,  className: 'bg-cyan-500/15 text-cyan-400' },
+  TRICEPS:    { label: 'پشت بازو',   icon: Dumbbell,  className: 'bg-sky-500/15 text-sky-400' },
+  FOREARMS:   { label: 'ساعد',       icon: Zap,       className: 'bg-teal-500/15 text-teal-400' },
+  CORE:       { label: 'شکم',        icon: Target,    className: 'bg-amber-500/15 text-amber-400' },
+  GLUTES:     { label: 'سرینی',      icon: Heart,     className: 'bg-rose-500/15 text-rose-400' },
+  QUADRICEPS: { label: 'ران جلو',    icon: Activity,  className: 'bg-orange-500/15 text-orange-400' },
+  HAMSTRINGS: { label: 'ران پشت',    icon: Activity,  className: 'bg-red-500/15 text-red-400' },
+  CALVES:     { label: 'ساق',        icon: Zap,       className: 'bg-lime-500/15 text-lime-400' },
+  FULL_BODY:  { label: 'کل بدن',     icon: User,      className: 'bg-emerald-500/15 text-emerald-400' },
+  CARDIO:     { label: 'کاردیو',     icon: Activity,  className: 'bg-pink-500/15 text-pink-400' },
+};
+
+// ─── Home Page ────────────────────────────────────────────────────────────────
 
 export function AthleteHomePage() {
   const { user } = useAuth();
   const { data: statsRes, isLoading: statsLoading } = useActiveProgramStats();
   const { data: nutritionRes } = useMyNutritionPlan();
+  const { data: muscleGroupsRes } = useMuscleGroups();
+  const muscleGroups = muscleGroupsRes?.data ?? [];
 
   const stats = statsRes?.data ?? null;
   const { data: programRes } = useProgram(stats?.programId ?? '');
@@ -62,24 +74,30 @@ export function AthleteHomePage() {
       </motion.div>
 
       {/* Categories */}
-      <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3, delay: 0.1 }}>
-        <div className="mb-3 flex items-center justify-between">
-          <h2 className="font-bold">دسته‌بندی‌ها</h2>
-          <Link to="/athlete/exercises" className="text-xs font-semibold text-surface-dark dark:text-brand-yellow">مشاهده همه</Link>
-        </div>
-        <div className="flex gap-4 overflow-x-auto pb-1 no-scrollbar">
-          {HOME_CATEGORIES.map((cat, i) => (
-            <motion.div key={cat.label} initial={{ opacity: 0, scale: 0.88 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.12 + i * 0.05, duration: 0.25, ease: [0.16, 1, 0.3, 1] }} className="shrink-0">
-              <Link to="/athlete/exercises" className="flex flex-col items-center gap-2">
-                <div className={`grid h-14 w-14 place-items-center rounded-2xl ${cat.className}`}>
-                  <cat.icon className="h-6 w-6" />
-                </div>
-                <span className="text-xs font-semibold text-slate-600 dark:text-white/60">{cat.label}</span>
-              </Link>
-            </motion.div>
-          ))}
-        </div>
-      </motion.div>
+      {muscleGroups.length > 0 && (
+        <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3, delay: 0.1 }}>
+          <div className="mb-3 flex items-center justify-between">
+            <h2 className="font-bold">دسته‌بندی‌ها</h2>
+            <Link to="/athlete/exercises" className="text-xs font-semibold text-surface-dark dark:text-brand-yellow">مشاهده همه</Link>
+          </div>
+          <div className="flex gap-4 overflow-x-auto pb-1 no-scrollbar">
+            {muscleGroups.map((item, i) => {
+              const meta = MUSCLE_GROUP_META[item.muscleGroup];
+              const Icon = meta.icon;
+              return (
+                <motion.div key={item.muscleGroup} initial={{ opacity: 0, scale: 0.88 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.12 + i * 0.05, duration: 0.25, ease: [0.16, 1, 0.3, 1] }} className="shrink-0">
+                  <Link to={`/athlete/exercises/muscle-group/${item.muscleGroup}`} className="flex flex-col items-center gap-2">
+                    <div className={`grid h-14 w-14 place-items-center rounded-2xl ${meta.className}`}>
+                      <Icon className="h-6 w-6" />
+                    </div>
+                    <span className="max-w-[60px] text-center text-xs font-semibold leading-tight text-slate-600 dark:text-white/60">{meta.label}</span>
+                  </Link>
+                </motion.div>
+              );
+            })}
+          </div>
+        </motion.div>
+      )}
 
       {/* Program Progress Card */}
       {!statsLoading && (stats ? (
@@ -311,11 +329,52 @@ const blockLabels = {
   TRISET: "تری ست",
 };
 
+function MuscleGroupGrid() {
+  const { data, isLoading } = useMuscleGroups();
+  const groups = data?.data ?? [];
+
+  if (isLoading) return <EmptyState title="در حال دریافت دسته‌بندی‌ها..." />;
+  if (groups.length === 0) return null;
+
+  return (
+    <div className="space-y-3">
+      <h2 className="font-bold text-slate-700 dark:text-white/80">دسته‌بندی بر اساس ناحیه بدن</h2>
+      <div className="grid grid-cols-3 gap-3 sm:grid-cols-4">
+        {groups.map((item, i) => {
+          const meta = MUSCLE_GROUP_META[item.muscleGroup];
+          const Icon = meta.icon;
+          return (
+            <motion.div
+              key={item.muscleGroup}
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: i * 0.04, duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
+            >
+              <Link
+                to={`/athlete/exercises/muscle-group/${item.muscleGroup}`}
+                className="flex flex-col items-center gap-2 rounded-2xl border border-slate-100 bg-white/70 p-3 text-center backdrop-blur-md transition hover:bg-white dark:border-white/[0.08] dark:bg-white/[0.05] dark:hover:bg-white/[0.09]"
+              >
+                <div className={`grid h-12 w-12 place-items-center rounded-xl ${meta.className}`}>
+                  <Icon className="h-5 w-5" />
+                </div>
+                <span className="text-xs font-semibold leading-tight text-slate-600 dark:text-white/60">{meta.label}</span>
+                <span className="text-[10px] text-slate-400 dark:text-white/30">{item.count} حرکت</span>
+              </Link>
+            </motion.div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
 export function ExerciseSearchPage() {
   const [search, setSearch] = useState("");
   const { data, isLoading, isError, error, fetchNextPage, hasNextPage, isFetchingNextPage } = useInfiniteExercises({ search });
   const exercises = data?.pages.flatMap((p) => p.data.items) ?? [];
   const sentinelRef = useScrollSentinel(fetchNextPage, hasNextPage && !isFetchingNextPage);
+
+  const showCategories = search.trim() === "" && exercises.length === 0 && !isLoading;
 
   return (
     <section className="space-y-4">
@@ -324,9 +383,63 @@ export function ExerciseSearchPage() {
         <p className="text-sm text-slate-500 dark:text-white/40">حرکت را پیدا کنید و آموزش آن را ببینید.</p>
       </div>
       <SearchBox placeholder="جستجو بر اساس نام حرکت" value={search} onChange={(event) => setSearch(event.target.value)} />
+
+      {showCategories ? <MuscleGroupGrid /> : null}
+
       {isError ? <EmptyState title={getApiErrorMessage(error)} /> : null}
       {isLoading ? <EmptyState title="در حال دریافت حرکات..." /> : null}
-      {!isLoading && exercises.length === 0 ? <EmptyState title="حرکتی پیدا نشد" /> : null}
+      {!isLoading && !showCategories && exercises.length === 0 ? <EmptyState title="حرکتی پیدا نشد" /> : null}
+      <div className="grid gap-3 sm:grid-cols-2">
+        {exercises.map((exercise) => (
+          <Link key={exercise.id} to={`/athlete/exercises/${exercise.id}`}>
+            <Card className="h-full">
+              <div className="flex items-center justify-between gap-3">
+                <div className="min-w-0">
+                  <h2 className="font-bold">{exercise.title}</h2>
+                  <p className="mt-1 line-clamp-2 text-sm leading-6 text-slate-500 dark:text-white/40">{truncateText(exercise.description, 120) || "توضیحاتی ثبت نشده است."}</p>
+                </div>
+                <ChevronLeft className="h-5 w-5 text-slate-400" />
+              </div>
+            </Card>
+          </Link>
+        ))}
+      </div>
+      <div ref={sentinelRef} />
+      {isFetchingNextPage ? <ScrollLoader /> : null}
+    </section>
+  );
+}
+
+export function ExercisesByMuscleGroupPage() {
+  const { muscleGroup = "" } = useParams();
+  const validMuscleGroup = muscleGroup as MuscleGroup;
+  const meta = MUSCLE_GROUP_META[validMuscleGroup];
+
+  const { data, isLoading, isError, error, fetchNextPage, hasNextPage, isFetchingNextPage } = useInfiniteExercises({
+    muscleGroup: validMuscleGroup,
+  });
+  const exercises = data?.pages.flatMap((p) => p.data.items) ?? [];
+  const sentinelRef = useScrollSentinel(fetchNextPage, hasNextPage && !isFetchingNextPage);
+
+  const Icon = meta?.icon;
+
+  return (
+    <section className="space-y-4">
+      <div className="flex items-center gap-3">
+        {meta && Icon ? (
+          <div className={`grid h-10 w-10 shrink-0 place-items-center rounded-xl ${meta.className}`}>
+            <Icon className="h-5 w-5" />
+          </div>
+        ) : null}
+        <div>
+          <h1 className="text-2xl font-black">{meta?.label ?? muscleGroup}</h1>
+          <p className="text-sm text-slate-500 dark:text-white/40">حرکات مربوط به این ناحیه بدن</p>
+        </div>
+      </div>
+
+      {isError ? <EmptyState title={getApiErrorMessage(error)} /> : null}
+      {isLoading ? <EmptyState title="در حال دریافت حرکات..." /> : null}
+      {!isLoading && exercises.length === 0 ? <EmptyState title="حرکتی برای این ناحیه ثبت نشده" /> : null}
       <div className="grid gap-3 sm:grid-cols-2">
         {exercises.map((exercise) => (
           <Link key={exercise.id} to={`/athlete/exercises/${exercise.id}`}>
