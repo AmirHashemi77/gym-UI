@@ -2,11 +2,19 @@ import axios, { AxiosError, type AxiosResponse, type InternalAxiosRequestConfig 
 import { useAuthStore } from '../features/auth/auth.store';
 import type { ApiErrorResponse, ApiResponse, AuthResponse, RefreshTokenRequest, Role } from './types';
 
-export const API_BASE_URL = 'http://localhost:3000/api/v1';
-export const MEDIA_BASE_URL = API_BASE_URL.replace('/api/v1', '');
+const configuredApiBaseUrl = import.meta.env.VITE_API_BASE_URL?.trim();
+
+export const API_BASE_URL = (configuredApiBaseUrl && configuredApiBaseUrl.length > 0
+  ? configuredApiBaseUrl
+  : '/api/v1'
+).replace(/\/$/, '');
+
+export const MEDIA_BASE_URL = API_BASE_URL.endsWith('/api/v1') ? API_BASE_URL.slice(0, -'/api/v1'.length) : '';
 
 export const getMediaUrl = (path: string | null | undefined): string | null => {
   if (!path) return null;
+  if (/^https?:\/\//i.test(path)) return path;
+  if (path.startsWith('/')) return `${MEDIA_BASE_URL}${path}`;
   return `${MEDIA_BASE_URL}/${path}`;
 };
 
