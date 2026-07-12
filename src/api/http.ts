@@ -1,25 +1,24 @@
-import axios, { AxiosError, type AxiosResponse, type InternalAxiosRequestConfig } from 'axios';
-import { useAuthStore } from '../features/auth/auth.store';
-import type { ApiErrorResponse, ApiResponse, AuthResponse, RefreshTokenRequest, Role } from './types';
+import axios, { AxiosError, type AxiosResponse, type InternalAxiosRequestConfig } from "axios";
+import { useAuthStore } from "../features/auth/auth.store";
+import type { ApiErrorResponse, ApiResponse, AuthResponse, RefreshTokenRequest, Role } from "./types";
 
 const configuredApiBaseUrl = import.meta.env.VITE_API_BASE_URL?.trim();
 
 export const API_BASE_URL = (configuredApiBaseUrl && configuredApiBaseUrl.length > 0
   ? configuredApiBaseUrl
-  : '/api/v1'
-).replace(/\/$/, '');
-
-export const MEDIA_BASE_URL = API_BASE_URL.endsWith('/api/v1') ? API_BASE_URL.slice(0, -'/api/v1'.length) : '';
+  : "/api/v1"
+).replace(/\/$/, "");
+export const MEDIA_BASE_URL = API_BASE_URL.endsWith("/api/v1") ? API_BASE_URL.slice(0, -"/api/v1".length) : "";
 
 export const getMediaUrl = (path: string | null | undefined): string | null => {
   if (!path) return null;
   if (/^https?:\/\//i.test(path)) return path;
-  if (path.startsWith('/')) return `${MEDIA_BASE_URL}${path}`;
+  if (path.startsWith("/")) return `${MEDIA_BASE_URL}${path}`;
   return `${MEDIA_BASE_URL}/${path}`;
 };
 
-export const ACCESS_TOKEN_KEY = 'accessToken';
-export const REFRESH_TOKEN_KEY = 'refreshToken';
+export const ACCESS_TOKEN_KEY = "accessToken";
+export const REFRESH_TOKEN_KEY = "refreshToken";
 
 type JwtPayload = {
   sub: string;
@@ -33,12 +32,12 @@ type RetriableRequestConfig = InternalAxiosRequestConfig & {
   _retry?: boolean;
 };
 
-const canUseStorage = () => typeof window !== 'undefined' && Boolean(window.localStorage);
+const canUseStorage = () => typeof window !== "undefined" && Boolean(window.localStorage);
 
 const decodeBase64Url = (value: string) => {
-  const normalized = value.replace(/-/g, '+').replace(/_/g, '/');
+  const normalized = value.replace(/-/g, "+").replace(/_/g, "/");
   const padding = (4 - (normalized.length % 4)) % 4;
-  const padded = normalized + '='.repeat(padding);
+  const padded = normalized + "=".repeat(padding);
   const binary = globalThis.atob(padded);
   const bytes = Uint8Array.from(binary, (character) => character.charCodeAt(0));
 
@@ -49,7 +48,7 @@ export const decodeJwtPayload = (token: string | null): JwtPayload | null => {
   if (!token) return null;
 
   try {
-    const [, payload] = token.split('.');
+    const [, payload] = token.split(".");
 
     if (!payload) return null;
 
@@ -59,25 +58,25 @@ export const decodeJwtPayload = (token: string | null): JwtPayload | null => {
   }
 };
 
-export const isJwtExpired = (payload: Pick<JwtPayload, 'exp'> | null) => {
+export const isJwtExpired = (payload: Pick<JwtPayload, "exp"> | null) => {
   if (!payload?.exp) return true;
 
   return payload.exp <= Math.floor(Date.now() / 1000);
 };
 
 const redirectToLogin = () => {
-  if (typeof window === 'undefined') return;
+  if (typeof window === "undefined") return;
 
-  const authPaths = ['/', '/login', '/register', '/coach-login'];
+  const authPaths = ["/", "/login", "/register", "/coach-login"];
   if (!authPaths.includes(window.location.pathname)) {
-    window.location.assign('/login');
+    window.location.assign("/login");
   }
 };
 
 export const tokenStorage = {
   getAccessToken: () => (canUseStorage() ? window.localStorage.getItem(ACCESS_TOKEN_KEY) : null),
   getRefreshToken: () => (canUseStorage() ? window.localStorage.getItem(REFRESH_TOKEN_KEY) : null),
-  setTokens: (tokens: Pick<AuthResponse, 'accessToken' | 'refreshToken'>) => {
+  setTokens: (tokens: Pick<AuthResponse, "accessToken" | "refreshToken">) => {
     if (!canUseStorage()) return;
 
     window.localStorage.setItem(ACCESS_TOKEN_KEY, tokens.accessToken);
@@ -101,14 +100,14 @@ export const getAccessTokenPayload = () => decodeJwtPayload(tokenStorage.getAcce
 export const http = axios.create({
   baseURL: API_BASE_URL,
   headers: {
-    Accept: 'application/json',
+    Accept: "application/json",
   },
 });
 
 export const publicHttp = axios.create({
   baseURL: API_BASE_URL,
   headers: {
-    Accept: 'application/json',
+    Accept: "application/json",
   },
 });
 
@@ -119,11 +118,11 @@ const refreshTokens = async () => {
 
   if (!refreshToken) {
     clearAuthSession();
-    throw new Error('Refresh token is missing.');
+    throw new Error("Refresh token is missing.");
   }
 
   refreshRequest ??= publicHttp
-    .post<RefreshTokenRequest, AxiosResponse<ApiResponse<AuthResponse>>>('/auth/refresh-token', { refreshToken })
+    .post<RefreshTokenRequest, AxiosResponse<ApiResponse<AuthResponse>>>("/auth/refresh-token", { refreshToken })
     .then((response) => {
       tokenStorage.setTokens(response.data.data);
       useAuthStore.getState().setUser(response.data.data.user);
@@ -193,7 +192,7 @@ export const getApiError = (error: unknown): ApiErrorResponse | null => {
   return null;
 };
 
-export const getApiErrorMessage = (error: unknown, fallback = 'خطایی رخ داد.') => {
+export const getApiErrorMessage = (error: unknown, fallback = "خطایی رخ داد.") => {
   const apiError = getApiError(error);
 
   if (apiError?.message) return apiError.message;
