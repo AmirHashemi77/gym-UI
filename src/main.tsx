@@ -3,6 +3,8 @@ import ReactDOM from 'react-dom/client';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { BrowserRouter } from 'react-router-dom';
 import { App } from './App';
+import { GlobalLoadingSpinner } from './components/GlobalLoadingSpinner';
+import { SuccessToasts } from './components/SuccessToasts';
 import { AuthProvider } from './features/auth';
 import './styles.css';
 
@@ -29,6 +31,8 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
       <BrowserRouter>
         <AuthProvider>
           <ThemeSync>
+            <GlobalLoadingSpinner />
+            <SuccessToasts />
             <App />
           </ThemeSync>
         </AuthProvider>

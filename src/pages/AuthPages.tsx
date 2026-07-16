@@ -4,7 +4,7 @@ import { Link, Navigate, useNavigate } from 'react-router-dom';
 import { getApiErrorMessage } from '../api/http';
 import type { CreateStudentRequest, Gender } from '../api/types';
 import { AuthLayout } from '../components/Layout';
-import { Button, Card, Input, Textarea } from '../components/ui';
+import { Button, Card, Input, PasswordInput, Textarea } from '../components/ui';
 import { useAuth } from '../features/auth';
 import { useLogin, useRegisterStudent } from '../hooks/auth';
 
@@ -22,10 +22,15 @@ type StudentRegisterForm = {
 };
 
 type StudentRegisterErrors = Partial<Record<keyof StudentRegisterForm, string>>;
+type RestrictedRegisterField = 'phone' | 'password' | 'confirmPassword' | 'age' | 'weight' | 'height';
 
 const iranMobilePattern = /^09\d{9}$/;
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const decimalWithTwoDigitsPattern = /^\d+(\.\d{1,2})?$/;
+const englishDigitsPattern = /^[0-9]*$/;
+const englishDecimalPattern = /^[0-9.]*$/;
+const englishKeyboardPattern = /^[\x20-\x7E]*$/;
+const englishKeyboardHint = 'لطفاً زبان کیبورد را انگلیسی کنید.';
 
 const validateOptionalDecimal = (value: string, min: number, label: string) => {
   const trimmedValue = value.trim();
@@ -99,6 +104,12 @@ function FieldError({ message }: { message?: string }) {
   return <p className="mt-1 text-xs font-medium text-rose-600 dark:text-rose-300">{message}</p>;
 }
 
+function KeyboardLanguageHint({ visible }: { visible: boolean }) {
+  if (!visible) return null;
+
+  return <p className="mt-1 text-xs font-medium text-amber-600 dark:text-amber-300">{englishKeyboardHint}</p>;
+}
+
 export function LandingPage() {
   const { user, isAuthenticated } = useAuth();
 
@@ -140,7 +151,23 @@ export function LoginPage({ mode }: { mode: 'student' | 'staff' }) {
   const navigate = useNavigate();
   const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
+  const [keyboardHintField, setKeyboardHintField] = useState<'phone' | 'password' | null>(null);
   const isStaff = mode === 'staff';
+
+  const handleRestrictedChange = (
+    field: 'phone' | 'password',
+    value: string,
+    pattern: RegExp,
+    updateValue: (nextValue: string) => void,
+  ) => {
+    if (!pattern.test(value)) {
+      setKeyboardHintField(field);
+      return;
+    }
+
+    updateValue(value);
+    setKeyboardHintField((current) => (current === field ? null : current));
+  };
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -166,20 +193,25 @@ export function LoginPage({ mode }: { mode: 'student' | 'staff' }) {
           </div>
         </div>
         <form className="space-y-3" onSubmit={handleSubmit}>
-          <Input
-            placeholder="شماره موبایل"
-            inputMode="tel"
-            value={phone}
-            onChange={(event) => setPhone(event.target.value)}
-            required
-          />
-          <Input
-            placeholder="رمز عبور"
-            type="password"
-            value={password}
-            onChange={(event) => setPassword(event.target.value)}
-            required
-          />
+          <div>
+            <Input
+              placeholder="شماره موبایل"
+              inputMode="tel"
+              value={phone}
+              onChange={(event) => handleRestrictedChange('phone', event.target.value, englishDigitsPattern, setPhone)}
+              required
+            />
+            <KeyboardLanguageHint visible={keyboardHintField === 'phone'} />
+          </div>
+          <div>
+            <PasswordInput
+              placeholder="رمز عبور"
+              value={password}
+              onChange={(event) => handleRestrictedChange('password', event.target.value, englishKeyboardPattern, setPassword)}
+              required
+            />
+            <KeyboardLanguageHint visible={keyboardHintField === 'password'} />
+          </div>
           {login.isError ? (
             <p className="rounded-lg bg-rose-50 px-3 py-2 text-sm text-rose-700 dark:bg-rose-500/10 dark:text-rose-300">
               {getApiErrorMessage(login.error)}
@@ -212,6 +244,7 @@ export function StudentRegisterPage() {
   const registerStudent = useRegisterStudent();
   const navigate = useNavigate();
   const [showValidationErrors, setShowValidationErrors] = useState(false);
+  const [keyboardHintField, setKeyboardHintField] = useState<RestrictedRegisterField | null>(null);
   const [form, setForm] = useState<StudentRegisterForm>({
     fullName: '',
     phone: '',
@@ -234,6 +267,16 @@ export function StudentRegisterPage() {
 
   const toOptionalNumber = (value: string) => (value.trim() ? Number(value) : undefined);
   const toOptionalString = (value: string) => (value.trim() ? value.trim() : undefined);
+
+  const handleRestrictedChange = (field: RestrictedRegisterField, value: string, pattern: RegExp) => {
+    if (!pattern.test(value)) {
+      setKeyboardHintField(field);
+      return;
+    }
+
+    setForm((current) => ({ ...current, [field]: value }));
+    setKeyboardHintField((current) => (current === field ? null : current));
+  };
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -291,9 +334,10 @@ export function StudentRegisterPage() {
                 placeholder="شماره موبایل"
                 inputMode="tel"
                 value={form.phone}
-                onChange={(event) => setForm({ ...form, phone: event.target.value })}
+                onChange={(event) => handleRestrictedChange('phone', event.target.value, englishDigitsPattern)}
                 aria-invalid={Boolean(visibleErrors.phone)}
               />
+              <KeyboardLanguageHint visible={keyboardHintField === 'phone'} />
               <FieldError message={visibleErrors.phone} />
             </div>
           </div>
@@ -309,23 +353,23 @@ export function StudentRegisterPage() {
           </div>
           <div className="grid gap-3 sm:grid-cols-2">
             <div>
-              <Input
+              <PasswordInput
                 placeholder="رمز عبور"
-                type="password"
                 value={form.password}
-                onChange={(event) => setForm({ ...form, password: event.target.value })}
+                onChange={(event) => handleRestrictedChange('password', event.target.value, englishKeyboardPattern)}
                 aria-invalid={Boolean(visibleErrors.password)}
               />
+              <KeyboardLanguageHint visible={keyboardHintField === 'password'} />
               <FieldError message={visibleErrors.password} />
             </div>
             <div>
-              <Input
+              <PasswordInput
                 placeholder="تکرار رمز عبور"
-                type="password"
                 value={form.confirmPassword}
-                onChange={(event) => setForm({ ...form, confirmPassword: event.target.value })}
+                onChange={(event) => handleRestrictedChange('confirmPassword', event.target.value, englishKeyboardPattern)}
                 aria-invalid={Boolean(visibleErrors.confirmPassword)}
               />
+              <KeyboardLanguageHint visible={keyboardHintField === 'confirmPassword'} />
               <FieldError message={visibleErrors.confirmPassword} />
             </div>
           </div>
@@ -335,9 +379,10 @@ export function StudentRegisterPage() {
                 placeholder="سن"
                 inputMode="numeric"
                 value={form.age}
-                onChange={(event) => setForm({ ...form, age: event.target.value })}
+                onChange={(event) => handleRestrictedChange('age', event.target.value, englishDigitsPattern)}
                 aria-invalid={Boolean(visibleErrors.age)}
               />
+              <KeyboardLanguageHint visible={keyboardHintField === 'age'} />
               <FieldError message={visibleErrors.age} />
             </div>
             <div>
@@ -345,9 +390,10 @@ export function StudentRegisterPage() {
                 placeholder="وزن"
                 inputMode="decimal"
                 value={form.weight}
-                onChange={(event) => setForm({ ...form, weight: event.target.value })}
+                onChange={(event) => handleRestrictedChange('weight', event.target.value, englishDecimalPattern)}
                 aria-invalid={Boolean(visibleErrors.weight)}
               />
+              <KeyboardLanguageHint visible={keyboardHintField === 'weight'} />
               <FieldError message={visibleErrors.weight} />
             </div>
             <div>
@@ -355,9 +401,10 @@ export function StudentRegisterPage() {
                 placeholder="قد"
                 inputMode="decimal"
                 value={form.height}
-                onChange={(event) => setForm({ ...form, height: event.target.value })}
+                onChange={(event) => handleRestrictedChange('height', event.target.value, englishDecimalPattern)}
                 aria-invalid={Boolean(visibleErrors.height)}
               />
+              <KeyboardLanguageHint visible={keyboardHintField === 'height'} />
               <FieldError message={visibleErrors.height} />
             </div>
           </div>

@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { programsService } from '../../api/programs.service';
 import type { CreateProgramRequest, ProgramsQuery, UpdateProgramRequest } from '../../api/types';
+import { useToastStore } from '../../stores/useToastStore';
 import { queryKeys } from '../queryKeys';
 
 export const usePrograms = (query?: ProgramsQuery) =>
@@ -21,7 +22,8 @@ export const useCreateProgram = () => {
 
   return useMutation({
     mutationFn: (payload: CreateProgramRequest) => programsService.createProgram(payload),
-    onSuccess: () => {
+    onSuccess: (response) => {
+      useToastStore.getState().showSuccess(response.message || 'برنامه تمرینی با موفقیت ثبت شد.');
       queryClient.invalidateQueries({ queryKey: queryKeys.programs.all });
     },
   });

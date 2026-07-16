@@ -71,8 +71,8 @@ export const programsService = {
     return unwrapResponse(response);
   },
 
-  getActiveStats: async (): Promise<ApiResponse<ActiveProgramStats>> => {
-    const response = await http.get<ApiResponse<ActiveProgramStats>>('/programs/active/stats');
+  getActiveStats: async (): Promise<ApiResponse<ActiveProgramStats | null>> => {
+    const response = await http.get<ApiResponse<ActiveProgramStats | null>>('/programs/active/stats');
     return unwrapResponse(response);
   },
 

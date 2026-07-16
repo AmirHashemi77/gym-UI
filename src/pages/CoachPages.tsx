@@ -18,7 +18,7 @@ import type {
   UpdateStudentRequest,
 } from '../api/types';
 import { ExercisePicker } from '../components/ExercisePicker';
-import { Button, Card, EmptyState, Input, Modal, ScrollLoader, SearchBox, Select, Textarea } from '../components/ui';
+import { Button, Card, EmptyState, Input, Modal, PasswordInput, ScrollLoader, SearchBox, Select, Textarea } from '../components/ui';
 import { useAuth } from '../features/auth';
 import { useCreateExercise, useDeleteExercise, useInfiniteExercises, useUpdateExercise } from '../hooks/exercises';
 import { useScrollSentinel } from '../hooks/useScrollSentinel';
@@ -677,7 +677,7 @@ function StudentForm({ student, onClose }: { student?: Student; onClose: () => v
         <Input placeholder="شماره موبایل" value={form.phone} onChange={(event) => setForm({ ...form, phone: event.target.value })} required />
         <Input placeholder="ایمیل" value={form.email} onChange={(event) => setForm({ ...form, email: event.target.value })} />
         {!student ? (
-          <Input placeholder="رمز عبور" type="password" value={form.password} onChange={(event) => setForm({ ...form, password: event.target.value })} required />
+          <PasswordInput placeholder="رمز عبور" value={form.password} onChange={(event) => setForm({ ...form, password: event.target.value })} required />
         ) : null}
         <Input placeholder="آواتار" value={form.avatar} onChange={(event) => setForm({ ...form, avatar: event.target.value })} />
         <div className="grid gap-2 sm:grid-cols-3">

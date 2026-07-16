@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { questionsService } from '../../api/questions.service';
 import type { AnswerQuestionRequest, CreateQuestionRequest, PaginationQuery } from '../../api/types';
+import { useToastStore } from '../../stores/useToastStore';
 import { queryKeys } from '../queryKeys';
 
 export const useQuestions = (query?: PaginationQuery) =>
@@ -14,7 +15,8 @@ export const useCreateQuestion = () => {
 
   return useMutation({
     mutationFn: (payload: CreateQuestionRequest) => questionsService.createQuestion(payload),
-    onSuccess: () => {
+    onSuccess: (response) => {
+      useToastStore.getState().showSuccess(response.message || 'سؤال شما با موفقیت ثبت شد.');
       queryClient.invalidateQueries({ queryKey: queryKeys.questions.all });
     },
   });

@@ -3,6 +3,7 @@ import { authService } from '../../api/auth.service';
 import { tokenStorage } from '../../api/http';
 import type { ChangePasswordRequest, CreateStudentRequest, LoginRequest, RefreshTokenRequest } from '../../api/types';
 import { useAuthStore } from '../../features/auth/auth.store';
+import { useToastStore } from '../../stores/useToastStore';
 import { queryKeys } from '../queryKeys';
 
 export const useLogin = () => {
@@ -12,6 +13,7 @@ export const useLogin = () => {
   return useMutation({
     mutationFn: (payload: LoginRequest) => authService.login(payload),
     onSuccess: (response) => {
+      useToastStore.getState().showSuccess(response.message || 'ورود شما با موفقیت انجام شد.');
       setUser(response.data.user);
       queryClient.setQueryData(queryKeys.auth.profile, {
         success: response.success,
@@ -26,6 +28,9 @@ export const useLogin = () => {
 export const useRegisterStudent = () =>
   useMutation({
     mutationFn: (payload: CreateStudentRequest) => authService.registerStudent(payload),
+    onSuccess: (response) => {
+      useToastStore.getState().showSuccess(response.message || 'ثبت‌نام شما با موفقیت تکمیل شد.');
+    },
   });
 
 export const useLogout = () => {

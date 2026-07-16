@@ -1,6 +1,7 @@
 import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { exercisesService } from '../../api/exercises.service';
 import type { CreateExerciseRequest, PaginationQuery, UpdateExerciseRequest } from '../../api/types';
+import { useToastStore } from '../../stores/useToastStore';
 import { queryKeys } from '../queryKeys';
 
 export const useExercises = (query?: PaginationQuery) =>
@@ -32,7 +33,8 @@ export const useCreateExercise = () => {
 
   return useMutation({
     mutationFn: (payload: CreateExerciseRequest) => exercisesService.createExercise(payload),
-    onSuccess: () => {
+    onSuccess: (response) => {
+      useToastStore.getState().showSuccess(response.message || 'حرکت جدید با موفقیت اضافه شد.');
       queryClient.invalidateQueries({ queryKey: queryKeys.exercises.all });
     },
   });

@@ -140,7 +140,7 @@ export function AthleteHomePage() {
             calendarRemainingDays={stats.calendarRemainingDays}
           />
         ) : (
-          <NoProgramCard />
+          <NoProgramCard message={statsRes?.message} />
         ))}
 
       {/* Food database */}
@@ -237,7 +237,7 @@ function NutritionPlanHomeCard({ plan }: { plan: NutritionPlan }) {
   );
 }
 
-function NoProgramCard() {
+function NoProgramCard({ message = "برنامه فعالی یافت نشد" }: { message?: string }) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 12 }}
@@ -248,7 +248,7 @@ function NoProgramCard() {
       <div className="flex items-center justify-between gap-4">
         <div className="min-w-0 flex-1">
           <p className="text-[11px] font-bold uppercase tracking-wide text-slate-500 dark:text-white/40">برنامه تمرینی</p>
-          <h3 className="mt-1 text-base font-black text-slate-700 dark:text-white">برنامه فعالی ندارید</h3>
+          <h3 className="mt-1 text-base font-black text-slate-700 dark:text-white">{message}</h3>
           <p className="mt-1.5 text-sm text-slate-500 dark:text-white/40">برای شروع تمرین از مربی خود درخواست برنامه دهید.</p>
           <button
             type="button"
@@ -542,7 +542,6 @@ export function ExerciseDetailPage() {
           <form className="space-y-3" onSubmit={handleQuestionSubmit}>
             <Textarea rows={4} placeholder="سوال خود را بنویسید" value={question} onChange={(event) => setQuestion(event.target.value)} />
             {createQuestion.isError ? <p className="text-sm text-rose-600">{getApiErrorMessage(createQuestion.error)}</p> : null}
-            {createQuestion.data?.message ? <p className="text-sm text-emerald-600">{createQuestion.data.message}</p> : null}
             <Button disabled={!question.trim() || createQuestion.isPending}>{createQuestion.isPending ? "در حال ثبت..." : "ثبت سوال"}</Button>
           </form>
         </Card>

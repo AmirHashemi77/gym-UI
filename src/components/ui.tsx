@@ -1,6 +1,6 @@
-import { ReactNode } from 'react';
+import { ReactNode, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Moon, Search, Sun, X } from 'lucide-react';
+import { Eye, EyeOff, Moon, Search, Sun, X } from 'lucide-react';
 import { useAppStore } from '../stores/useAppStore';
 
 export function Button({
@@ -55,6 +55,31 @@ export function Input({ className = '', ...props }: React.InputHTMLAttributes<HT
       className={`min-h-11 w-full rounded-xl border border-slate-200 bg-white/80 px-3 text-sm outline-none transition-all duration-200 placeholder:text-slate-400 focus:border-brand-yellow/60 focus:ring-4 focus:ring-brand-yellow/10 dark:border-white/10 dark:bg-white/[0.07] dark:text-white dark:placeholder:text-white/30 dark:focus:border-brand-yellow/50 dark:backdrop-blur-md ${className}`}
       {...props}
     />
+  );
+}
+
+export function PasswordInput({ className = '', ...props }: Omit<React.InputHTMLAttributes<HTMLInputElement>, 'type'>) {
+  const [isPasswordVisible, setIsPasswordVisible] = useState(false);
+  const toggleLabel = isPasswordVisible ? 'مخفی کردن رمز عبور' : 'نمایش رمز عبور';
+
+  return (
+    <div className="relative w-full">
+      <Input
+        {...props}
+        type={isPasswordVisible ? 'text' : 'password'}
+        className={`pl-11 ${className}`}
+      />
+      <button
+        type="button"
+        className="absolute left-1 top-1/2 grid h-9 w-9 -translate-y-1/2 place-items-center rounded-lg text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-yellow/60 dark:text-white/40 dark:hover:bg-white/10 dark:hover:text-white/70"
+        onClick={() => setIsPasswordVisible((visible) => !visible)}
+        aria-label={toggleLabel}
+        title={toggleLabel}
+        aria-pressed={isPasswordVisible}
+      >
+        {isPasswordVisible ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+      </button>
+    </div>
   );
 }
 
