@@ -511,7 +511,7 @@ export function ExerciseDetailPage() {
 
   return (
     <section className="space-y-4">
-      <Card className="space-y-4">
+      <Card className="space-y-4 !backdrop-blur-none">
         <div className="flex items-start justify-between gap-3">
           <div>
             <h1 className="text-2xl font-black">{exercise.title}</h1>
@@ -527,14 +527,14 @@ export function ExerciseDetailPage() {
           isGif ? (
             <img src={mediaUrl} alt={exercise.title} className="w-full rounded-xl object-cover" />
           ) : (
-            <video className="aspect-video w-full rounded-xl bg-slate-950 dark:bg-surface-dark object-contain" src={mediaUrl} controls poster={getMediaUrl(exercise.thumbnailUrl) ?? undefined} />
+            <video className="exercise-video aspect-video w-full rounded-xl bg-slate-950 object-contain dark:bg-surface-dark" src={mediaUrl} controls poster={getMediaUrl(exercise.thumbnailUrl) ?? undefined} />
           )
         ) : null}
         {exercise.description ? <p className="leading-8 text-slate-700 dark:text-white/70">{exercise.description}</p> : null}
       </Card>
 
       {user?.role === "STUDENT" ? (
-        <Card className="space-y-3">
+        <Card className="space-y-3 !backdrop-blur-none">
           <h2 className="flex items-center gap-2 font-bold">
             <MessageCircle className="h-5 w-5 text-green-700 dark:text-brand-yellow" />
             ثبت سوال درباره این حرکت

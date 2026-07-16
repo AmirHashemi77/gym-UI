@@ -23,14 +23,23 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   background: linear-gradient(135deg, #f8f5fc 0%, #ede9f2 100%);
-  background-attachment: fixed;
+  background-repeat: no-repeat;
+  background-size: cover;
   min-height: 100dvh;
 }
 
 html.dark body {
   background: linear-gradient(135deg, #46344E 0%, #5A5560 100%);
-  background-attachment: fixed;
+  background-repeat: no-repeat;
+  background-size: cover;
   color: #ffffff;
+}
+
+.exercise-video {
+  backface-visibility: hidden;
+  contain: paint;
+  isolation: isolate;
+  transform: translateZ(0);
 }
 
 button,
