@@ -11,10 +11,16 @@ export const API_BASE_URL = (configuredApiBaseUrl && configuredApiBaseUrl.length
 export const MEDIA_BASE_URL = API_BASE_URL.endsWith("/api/v1") ? API_BASE_URL.slice(0, -"/api/v1".length) : "";
 
 export const getMediaUrl = (path: string | null | undefined): string | null => {
-  if (!path) return null;
-  if (/^https?:\/\//i.test(path)) return path;
-  if (path.startsWith("/")) return `${MEDIA_BASE_URL}${path}`;
-  return `${MEDIA_BASE_URL}/${path}`;
+  const value = path?.trim();
+  if (!value) return null;
+  if (/^https?:\/\//i.test(value)) return value;
+
+  // Seeded exercises historically used `videos/3.mp4`, while production
+  // videos live in the persistent `/app/public/uploads/videos` Docker volume.
+  const normalizedPath = value.replace(/^\/?videos\//i, "/uploads/videos/");
+
+  if (normalizedPath.startsWith("/")) return `${MEDIA_BASE_URL}${normalizedPath}`;
+  return `${MEDIA_BASE_URL}/${normalizedPath}`;
 };
 
 export const ACCESS_TOKEN_KEY = "accessToken";

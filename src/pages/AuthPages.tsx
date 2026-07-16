@@ -4,7 +4,7 @@ import { Link, Navigate, useNavigate } from 'react-router-dom';
 import { getApiErrorMessage } from '../api/http';
 import type { CreateStudentRequest, Gender } from '../api/types';
 import { AuthLayout } from '../components/Layout';
-import { Button, Card, Input, Textarea, ThemeToggle } from '../components/ui';
+import { Button, Card, Input, Textarea } from '../components/ui';
 import { useAuth } from '../features/auth';
 import { useLogin, useRegisterStudent } from '../hooks/auth';
 
@@ -109,7 +109,7 @@ export function LandingPage() {
   return (
     <AuthLayout>
       <Card className="space-y-5">
-        <div className="flex items-center justify-between">
+        <div className="flex items-center">
           <div className="flex items-center gap-3">
             <span className="grid h-12 w-12 place-items-center rounded-xl bg-brand-yellow shadow-glow-sm">
               <Dumbbell className="h-6 w-6 text-surface-dark" />
@@ -119,7 +119,6 @@ export function LandingPage() {
               <p className="text-sm text-slate-500 dark:text-white/40">مدیریت تمرین، ورزشکار و پرسش ها</p>
             </div>
           </div>
-          <ThemeToggle />
         </div>
         <div className="grid gap-3">
           <Link to="/login">
@@ -160,12 +159,11 @@ export function LoginPage({ mode }: { mode: 'student' | 'staff' }) {
   return (
     <AuthLayout>
       <Card className="space-y-5">
-        <div className="flex items-center justify-between">
+        <div>
           <div>
             <h1 className="text-2xl font-black">{isStaff ? 'ورود مربی / ادمین' : 'ورود ورزشکار'}</h1>
             <p className="mt-1 text-sm text-slate-500 dark:text-white/40">شماره موبایل و رمز عبور خود را وارد کنید.</p>
           </div>
-          <ThemeToggle />
         </div>
         <form className="space-y-3" onSubmit={handleSubmit}>
           <Input
@@ -263,7 +261,7 @@ export function StudentRegisterPage() {
   return (
     <AuthLayout size="wide">
       <Card className="space-y-5">
-        <div className="flex items-start justify-between gap-4">
+        <div className="flex items-start gap-4">
           <div className="flex items-start gap-3">
             <span className="grid h-12 w-12 shrink-0 place-items-center rounded-xl bg-brand-yellow shadow-glow-sm">
               <UserPlus className="h-6 w-6 text-surface-dark" />
@@ -275,7 +273,6 @@ export function StudentRegisterPage() {
               </p>
             </div>
           </div>
-          <ThemeToggle />
         </div>
 
         <form className="space-y-3" onSubmit={handleSubmit} noValidate>

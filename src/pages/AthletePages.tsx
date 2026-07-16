@@ -1,4 +1,25 @@
-import { Activity, Bell, Bookmark, BookmarkCheck, BookOpen, CheckCircle2, ChevronLeft, Clock, Dumbbell, Heart, type LucideIcon, MessageCircle, NotebookText, Play, Search, Target, UtensilsCrossed, User, Waves, Zap } from "lucide-react";
+import {
+  Activity,
+  Bell,
+  Bookmark,
+  BookmarkCheck,
+  BookOpen,
+  CheckCircle2,
+  ChevronLeft,
+  Clock,
+  Dumbbell,
+  Heart,
+  type LucideIcon,
+  MessageCircle,
+  NotebookText,
+  Play,
+  Search,
+  Target,
+  UtensilsCrossed,
+  User,
+  Waves,
+  Zap,
+} from "lucide-react";
 import { motion } from "framer-motion";
 import { FormEvent, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
@@ -20,19 +41,19 @@ import { truncateText } from "../utils/text";
 // ─── Muscle Group Meta ────────────────────────────────────────────────────────
 
 const MUSCLE_GROUP_META: Record<MuscleGroup, { label: string; icon: LucideIcon; className: string }> = {
-  CHEST:      { label: 'سینه',       icon: Dumbbell,  className: 'bg-blue-500/15 text-blue-400' },
-  BACK:       { label: 'پشت',        icon: Waves,     className: 'bg-indigo-500/15 text-indigo-400' },
-  SHOULDERS:  { label: 'شانه',       icon: Zap,       className: 'bg-violet-500/15 text-violet-400' },
-  BICEPS:     { label: 'جلو بازو',   icon: Dumbbell,  className: 'bg-cyan-500/15 text-cyan-400' },
-  TRICEPS:    { label: 'پشت بازو',   icon: Dumbbell,  className: 'bg-sky-500/15 text-sky-400' },
-  FOREARMS:   { label: 'ساعد',       icon: Zap,       className: 'bg-teal-500/15 text-teal-400' },
-  CORE:       { label: 'شکم',        icon: Target,    className: 'bg-amber-500/15 text-amber-400' },
-  GLUTES:     { label: 'سرینی',      icon: Heart,     className: 'bg-rose-500/15 text-rose-400' },
-  QUADRICEPS: { label: 'ران جلو',    icon: Activity,  className: 'bg-orange-500/15 text-orange-400' },
-  HAMSTRINGS: { label: 'ران پشت',    icon: Activity,  className: 'bg-red-500/15 text-red-400' },
-  CALVES:     { label: 'ساق',        icon: Zap,       className: 'bg-lime-500/15 text-lime-400' },
-  FULL_BODY:  { label: 'کل بدن',     icon: User,      className: 'bg-emerald-500/15 text-emerald-400' },
-  CARDIO:     { label: 'کاردیو',     icon: Activity,  className: 'bg-pink-500/15 text-pink-400' },
+  CHEST: { label: "سینه", icon: Dumbbell, className: "bg-blue-500/15 text-blue-400" },
+  BACK: { label: "پشت", icon: Waves, className: "bg-indigo-500/15 text-indigo-400" },
+  SHOULDERS: { label: "شانه", icon: Zap, className: "bg-violet-500/15 text-violet-400" },
+  BICEPS: { label: "جلو بازو", icon: Dumbbell, className: "bg-cyan-500/15 text-cyan-400" },
+  TRICEPS: { label: "پشت بازو", icon: Dumbbell, className: "bg-sky-500/15 text-sky-400" },
+  FOREARMS: { label: "ساعد", icon: Zap, className: "bg-teal-500/15 text-teal-400" },
+  CORE: { label: "شکم", icon: Target, className: "bg-amber-500/15 text-amber-400" },
+  GLUTES: { label: "سرینی", icon: Heart, className: "bg-rose-500/15 text-rose-400" },
+  QUADRICEPS: { label: "ران جلو", icon: Activity, className: "bg-orange-500/15 text-orange-400" },
+  HAMSTRINGS: { label: "ران پشت", icon: Activity, className: "bg-red-500/15 text-red-400" },
+  CALVES: { label: "ساق", icon: Zap, className: "bg-lime-500/15 text-lime-400" },
+  FULL_BODY: { label: "کل بدن", icon: User, className: "bg-emerald-500/15 text-emerald-400" },
+  CARDIO: { label: "کاردیو", icon: Activity, className: "bg-pink-500/15 text-pink-400" },
 };
 
 // ─── Home Page ────────────────────────────────────────────────────────────────
@@ -45,7 +66,7 @@ export function AthleteHomePage() {
   const muscleGroups = muscleGroupsRes?.data ?? [];
 
   const stats = statsRes?.data ?? null;
-  const { data: programRes } = useProgram(stats?.programId ?? '');
+  const { data: programRes } = useProgram(stats?.programId ?? "");
 
   const activeProgram = programRes?.data ?? null;
   const nutritionPlan = nutritionRes?.data ?? null;
@@ -59,7 +80,7 @@ export function AthleteHomePage() {
           <h1 className="text-2xl font-black">{user?.fullName}!</h1>
         </div>
         <img
-          src={user?.avatar ?? (user?.gender === 'FEMALE' ? '/images/women.png' : '/images/men.png')}
+          src={user?.avatar ?? (user?.gender === "FEMALE" ? "/images/women.png" : "/images/men.png")}
           alt={user?.fullName}
           className="h-12 w-12 rounded-full object-cover ring-2 ring-brand-yellow/30"
         />
@@ -78,14 +99,22 @@ export function AthleteHomePage() {
         <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3, delay: 0.1 }}>
           <div className="mb-3 flex items-center justify-between">
             <h2 className="font-bold">دسته‌بندی‌ها</h2>
-            <Link to="/athlete/exercises" className="text-xs font-semibold text-surface-dark dark:text-brand-yellow">مشاهده همه</Link>
+            <Link to="/athlete/exercises" className="text-xs font-semibold text-surface-dark dark:text-brand-yellow">
+              مشاهده همه
+            </Link>
           </div>
           <div className="flex gap-4 overflow-x-auto pb-1 no-scrollbar">
             {muscleGroups.map((item, i) => {
               const meta = MUSCLE_GROUP_META[item.muscleGroup];
               const Icon = meta.icon;
               return (
-                <motion.div key={item.muscleGroup} initial={{ opacity: 0, scale: 0.88 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.12 + i * 0.05, duration: 0.25, ease: [0.16, 1, 0.3, 1] }} className="shrink-0">
+                <motion.div
+                  key={item.muscleGroup}
+                  initial={{ opacity: 0, scale: 0.88 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: 0.12 + i * 0.05, duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
+                  className="shrink-0"
+                >
                   <Link to={`/athlete/exercises/muscle-group/${item.muscleGroup}`} className="flex flex-col items-center gap-2">
                     <div className={`grid h-14 w-14 place-items-center rounded-2xl ${meta.className}`}>
                       <Icon className="h-6 w-6" />
@@ -100,16 +129,19 @@ export function AthleteHomePage() {
       )}
 
       {/* Program Progress Card */}
-      {!statsLoading && (stats ? (
-        <ProgramProgressCard
-          programTitle={stats.programTitle}
-          remainingDays={stats.remainingDays}
-          totalDays={stats.totalDays}
-          completedDays={stats.completedDays}
-          durationDays={stats.durationDays}
-          calendarRemainingDays={stats.calendarRemainingDays}
-        />
-      ) : <NoProgramCard />)}
+      {!statsLoading &&
+        (stats ? (
+          <ProgramProgressCard
+            programTitle={stats.programTitle}
+            remainingDays={stats.remainingDays}
+            totalDays={stats.totalDays}
+            completedDays={stats.completedDays}
+            durationDays={stats.durationDays}
+            calendarRemainingDays={stats.calendarRemainingDays}
+          />
+        ) : (
+          <NoProgramCard />
+        ))}
 
       {/* Food database */}
       <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.35, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}>
@@ -118,7 +150,9 @@ export function AthleteHomePage() {
             <BookOpen className="h-4 w-4 text-teal-600 dark:text-teal-400" />
             <h2 className="font-bold">بانک غذایی</h2>
           </div>
-          <Link to="/athlete/foods" className="text-xs font-semibold text-teal-600 dark:text-teal-400">مشاهده همه</Link>
+          <Link to="/athlete/foods" className="text-xs font-semibold text-teal-600 dark:text-teal-400">
+            مشاهده همه
+          </Link>
         </div>
         <HomeFoodCategoriesWidget />
       </motion.div>
@@ -135,12 +169,7 @@ export function AthleteHomePage() {
 function ActiveProgramHomeCard({ program }: { program: Program }) {
   const sortedDays = [...program.days].sort((a, b) => a.dayNumber - b.dayNumber);
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 8 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.35, delay: 0.22, ease: [0.16, 1, 0.3, 1] }}
-      className="w-full min-w-0"
-    >
+    <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.35, delay: 0.22, ease: [0.16, 1, 0.3, 1] }} className="w-full min-w-0">
       <div className="mb-3 flex items-center justify-between">
         <div className="flex items-center gap-2">
           <NotebookText className="h-4 w-4 text-surface-dark dark:text-brand-yellow" />
@@ -180,32 +209,22 @@ function NutritionPlanHomeCard({ plan }: { plan: NutritionPlan }) {
   const hiddenCount = sortedMeals.length - visible.length;
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 8 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.35, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
-      className="w-full min-w-0"
-    >
+    <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.35, delay: 0.3, ease: [0.16, 1, 0.3, 1] }} className="w-full min-w-0">
       <div className="mb-3 flex items-center justify-between">
         <div className="flex items-center gap-2">
           <UtensilsCrossed className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
           <h2 className="font-bold">برنامه تغذیه</h2>
         </div>
-        <Link to="/athlete/nutrition" className="text-xs font-semibold text-emerald-600 dark:text-emerald-400">مشاهده کامل</Link>
+        <Link to="/athlete/nutrition" className="text-xs font-semibold text-emerald-600 dark:text-emerald-400">
+          مشاهده کامل
+        </Link>
       </div>
       <div className="overflow-hidden rounded-2xl border border-slate-200/80 bg-white/80 backdrop-blur-md dark:border-white/10 dark:bg-white/[0.07]">
         {visible.map((meal, i) => (
-          <div
-            key={meal.id}
-            className={`flex min-w-0 items-start gap-3 px-4 py-3 ${i < visible.length - 1 || hiddenCount > 0 ? 'border-b border-slate-100 dark:border-white/[0.06]' : ''}`}
-          >
-            <span className={`mt-0.5 shrink-0 rounded-lg px-2 py-0.5 text-[11px] font-bold ${athleteMealColors[meal.type]}`}>
-              {meal.label}
-            </span>
+          <div key={meal.id} className={`flex min-w-0 items-start gap-3 px-4 py-3 ${i < visible.length - 1 || hiddenCount > 0 ? "border-b border-slate-100 dark:border-white/[0.06]" : ""}`}>
+            <span className={`mt-0.5 shrink-0 rounded-lg px-2 py-0.5 text-[11px] font-bold ${athleteMealColors[meal.type]}`}>{meal.label}</span>
             <p className="min-w-0 flex-1 truncate text-sm text-slate-600 dark:text-white/60">{meal.description}</p>
-            {meal.reminderTime ? (
-              <span className="shrink-0 text-xs tabular-nums text-slate-400 dark:text-white/30">{meal.reminderTime}</span>
-            ) : null}
+            {meal.reminderTime ? <span className="shrink-0 text-xs tabular-nums text-slate-400 dark:text-white/30">{meal.reminderTime}</span> : null}
           </div>
         ))}
         {hiddenCount > 0 ? (
@@ -270,12 +289,7 @@ function ProgramProgressCard({
   const radius = 40;
   const circumference = 2 * Math.PI * radius;
   const displayDays = calendarRemainingDays !== null ? calendarRemainingDays : remainingDays;
-  const progress =
-    durationDays && calendarRemainingDays !== null
-      ? calendarRemainingDays / durationDays
-      : totalDays > 0
-        ? completedDays / totalDays
-        : 0;
+  const progress = durationDays && calendarRemainingDays !== null ? calendarRemainingDays / durationDays : totalDays > 0 ? completedDays / totalDays : 0;
   const safeProgress = Math.min(1, Math.max(0, progress));
 
   return (
@@ -344,12 +358,7 @@ function MuscleGroupGrid() {
           const meta = MUSCLE_GROUP_META[item.muscleGroup];
           const Icon = meta.icon;
           return (
-            <motion.div
-              key={item.muscleGroup}
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: i * 0.04, duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
-            >
+            <motion.div key={item.muscleGroup} initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: i * 0.04, duration: 0.22, ease: [0.16, 1, 0.3, 1] }}>
               <Link
                 to={`/athlete/exercises/muscle-group/${item.muscleGroup}`}
                 className="flex flex-col items-center gap-2 rounded-2xl border border-slate-100 bg-white/70 p-3 text-center backdrop-blur-md transition hover:bg-white dark:border-white/[0.08] dark:bg-white/[0.05] dark:hover:bg-white/[0.09]"
@@ -498,7 +507,7 @@ export function ExerciseDetailPage() {
   if (!exercise) return <EmptyState title="حرکت پیدا نشد" />;
 
   const mediaUrl = getMediaUrl(exercise.videoUrl);
-  const isGif = exercise.videoUrl?.toLowerCase().endsWith('.gif') ?? false;
+  const isGif = exercise.videoUrl?.toLowerCase().endsWith(".gif") ?? false;
 
   return (
     <section className="space-y-4">
@@ -580,21 +589,23 @@ export function MyProgramsPage() {
       {isLoading ? <EmptyState title="در حال دریافت برنامه ها..." /> : null}
       {isError ? <EmptyState title={getApiErrorMessage(error)} /> : null}
       {!isLoading && programs.length === 0 ? <EmptyState title="برنامه ای ثبت نشده است" /> : null}
-      {programs.map((program) => (
-        <Link key={program.id} to={`/athlete/programs/${program.id}`}>
-          <Card>
-            <div className="flex items-center justify-between">
-              <div>
-                <h2 className="font-bold">{program.title}</h2>
-                <p className="mt-1 text-sm text-slate-500 dark:text-white/40">
-                  {formatPersianDate(program.createdAt)} - {program.days.length} روز تمرین
-                </p>
+      <div className="space-y-3">
+        {programs.map((program) => (
+          <Link className="block" key={program.id} to={`/athlete/programs/${program.id}`}>
+            <Card>
+              <div className="flex items-center justify-between">
+                <div>
+                  <h2 className="font-bold">{program.title}</h2>
+                  <p className="mt-1 text-sm text-slate-500 dark:text-white/40">
+                    {formatPersianDate(program.createdAt)} - {program.days.length} روز تمرین
+                  </p>
+                </div>
+                <ChevronLeft className="h-5 w-5 text-slate-400" />
               </div>
-              <ChevronLeft className="h-5 w-5 text-slate-400" />
-            </div>
-          </Card>
-        </Link>
-      ))}
+            </Card>
+          </Link>
+        ))}
+      </div>
     </section>
   );
 }
@@ -602,10 +613,10 @@ export function MyProgramsPage() {
 // ─── Nutrition Page ───────────────────────────────────────────────────────────
 
 const athleteMealColors: Record<MealType, string> = {
-  BREAKFAST: 'bg-orange-100 text-orange-700 dark:bg-orange-400/10 dark:text-orange-400',
-  LUNCH: 'bg-amber-100 text-amber-700 dark:bg-amber-400/10 dark:text-amber-400',
-  DINNER: 'bg-indigo-100 text-indigo-700 dark:bg-indigo-400/10 dark:text-indigo-400',
-  SNACK: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-400/10 dark:text-emerald-400',
+  BREAKFAST: "bg-orange-100 text-orange-700 dark:bg-orange-400/10 dark:text-orange-400",
+  LUNCH: "bg-amber-100 text-amber-700 dark:bg-amber-400/10 dark:text-amber-400",
+  DINNER: "bg-indigo-100 text-indigo-700 dark:bg-indigo-400/10 dark:text-indigo-400",
+  SNACK: "bg-emerald-100 text-emerald-700 dark:bg-emerald-400/10 dark:text-emerald-400",
 };
 
 export function NutritionPage() {
@@ -613,9 +624,7 @@ export function NutritionPage() {
   const updateReminder = useUpdateMealReminder();
   const [reminderTimes, setReminderTimes] = useState<Record<string, string>>({});
   const [savedMeals, setSavedMeals] = useState<Set<string>>(new Set());
-  const [notifPermission, setNotifPermission] = useState<NotificationPermission>(
-    'Notification' in window ? Notification.permission : 'denied',
-  );
+  const [notifPermission, setNotifPermission] = useState<NotificationPermission>("Notification" in window ? Notification.permission : "denied");
 
   const plan = data?.data ?? null;
 
@@ -634,7 +643,7 @@ export function NutritionPage() {
   const handleEnableNotifications = async () => {
     const permission = await requestNotificationPermission();
     setNotifPermission(permission);
-    if (permission !== 'granted') return;
+    if (permission !== "granted") return;
     const vapidKey = import.meta.env.VITE_VAPID_PUBLIC_KEY as string | undefined;
     if (!vapidKey) return;
     const sub = await subscribeToPush(vapidKey);
@@ -643,7 +652,7 @@ export function NutritionPage() {
     if (!json.endpoint || !json.keys) return;
     await notificationsService.subscribePush({
       endpoint: json.endpoint,
-      keys: { p256dh: json.keys['p256dh'], auth: json.keys['auth'] },
+      keys: { p256dh: json.keys["p256dh"], auth: json.keys["auth"] },
     });
   };
 
@@ -665,17 +674,15 @@ export function NutritionPage() {
       </div>
 
       {/* Notification permission banner */}
-      {notifPermission !== 'granted' ? (
+      {notifPermission !== "granted" ? (
         <div className="flex items-center justify-between gap-3 rounded-2xl border border-amber-200 bg-amber-50 p-4 dark:border-amber-400/20 dark:bg-amber-400/[0.06]">
           <div className="flex min-w-0 items-center gap-3">
             <Bell className="h-5 w-5 shrink-0 text-amber-600 dark:text-amber-400" />
             <p className="truncate text-sm font-semibold text-amber-800 dark:text-amber-300">
-              {notifPermission === 'denied'
-                ? 'اجازه نوتیفیکیشن داده نشده؛ از تنظیمات مرورگر فعال کنید.'
-                : 'برای یادآوری وعده‌ها اعلان را فعال کنید.'}
+              {notifPermission === "denied" ? "اجازه نوتیفیکیشن داده نشده؛ از تنظیمات مرورگر فعال کنید." : "برای یادآوری وعده‌ها اعلان را فعال کنید."}
             </p>
           </div>
-          {notifPermission === 'default' ? (
+          {notifPermission === "default" ? (
             <button
               onClick={handleEnableNotifications}
               className="shrink-0 rounded-xl border border-amber-300 bg-amber-100 px-3 py-1.5 text-xs font-bold text-amber-800 transition hover:bg-amber-200 dark:border-amber-400/30 dark:bg-amber-400/10 dark:text-amber-300 dark:hover:bg-amber-400/20"
@@ -692,55 +699,51 @@ export function NutritionPage() {
       )}
 
       {isLoading ? <EmptyState title="در حال دریافت برنامه تغذیه..." /> : null}
-      {!isLoading && !plan ? (
-        <EmptyState title="برنامه تغذیه‌ای دریافت نکرده‌اید" caption="برنامه غذایی شما توسط مربی ایجاد خواهد شد." />
-      ) : null}
+      {!isLoading && !plan ? <EmptyState title="برنامه تغذیه‌ای دریافت نکرده‌اید" caption="برنامه غذایی شما توسط مربی ایجاد خواهد شد." /> : null}
 
       {plan ? (
         <div className="space-y-3">
-          {[...plan.meals].sort((a, b) => a.order - b.order).map((meal) => (
-            <Card key={meal.id} className="space-y-3">
-              <div className="flex items-center justify-between gap-2">
-                <span className={`rounded-xl px-3 py-1 text-xs font-bold ${athleteMealColors[meal.type]}`}>
-                  {meal.label}
-                </span>
-                {savedMeals.has(meal.id) ? (
-                  <span className="flex items-center gap-1 text-xs font-semibold text-emerald-600 dark:text-emerald-400">
-                    <CheckCircle2 className="h-3.5 w-3.5" />
-                    ذخیره شد
-                  </span>
-                ) : null}
-              </div>
-              <p className="whitespace-pre-line text-sm leading-7 text-slate-700 dark:text-white/70">
-                {meal.description}
-              </p>
-              {notifPermission === 'granted' ? (
-                <div className="flex items-center gap-2 border-t border-slate-100 pt-3 dark:border-white/[0.07]">
-                  <Clock className="h-4 w-4 shrink-0 text-slate-400 dark:text-white/30" />
-                  <input
-                    type="time"
-                    value={reminderTimes[meal.id] ?? ''}
-                    onChange={(e) => {
-                      setSavedMeals((prev) => {
-                        const next = new Set(prev);
-                        next.delete(meal.id);
-                        return next;
-                      });
-                      setReminderTimes((prev) => ({ ...prev, [meal.id]: e.target.value }));
-                    }}
-                    className="min-h-9 flex-1 rounded-xl border border-slate-200 bg-white/80 px-3 text-sm outline-none transition-all duration-200 focus:border-brand-yellow/60 focus:ring-4 focus:ring-brand-yellow/10 dark:border-white/10 dark:bg-white/[0.07] dark:text-white dark:backdrop-blur-md"
-                  />
-                  <button
-                    disabled={updateReminder.isPending}
-                    onClick={() => handleSaveReminder(meal)}
-                    className="shrink-0 rounded-xl border border-slate-200 bg-white/80 px-3 py-2 text-xs font-bold text-slate-700 transition hover:bg-slate-100 disabled:opacity-50 dark:border-white/10 dark:bg-white/[0.07] dark:text-white dark:hover:bg-white/[0.12]"
-                  >
-                    ذخیره
-                  </button>
+          {[...plan.meals]
+            .sort((a, b) => a.order - b.order)
+            .map((meal) => (
+              <Card key={meal.id} className="space-y-3">
+                <div className="flex items-center justify-between gap-2">
+                  <span className={`rounded-xl px-3 py-1 text-xs font-bold ${athleteMealColors[meal.type]}`}>{meal.label}</span>
+                  {savedMeals.has(meal.id) ? (
+                    <span className="flex items-center gap-1 text-xs font-semibold text-emerald-600 dark:text-emerald-400">
+                      <CheckCircle2 className="h-3.5 w-3.5" />
+                      ذخیره شد
+                    </span>
+                  ) : null}
                 </div>
-              ) : null}
-            </Card>
-          ))}
+                <p className="whitespace-pre-line text-sm leading-7 text-slate-700 dark:text-white/70">{meal.description}</p>
+                {notifPermission === "granted" ? (
+                  <div className="flex items-center gap-2 border-t border-slate-100 pt-3 dark:border-white/[0.07]">
+                    <Clock className="h-4 w-4 shrink-0 text-slate-400 dark:text-white/30" />
+                    <input
+                      type="time"
+                      value={reminderTimes[meal.id] ?? ""}
+                      onChange={(e) => {
+                        setSavedMeals((prev) => {
+                          const next = new Set(prev);
+                          next.delete(meal.id);
+                          return next;
+                        });
+                        setReminderTimes((prev) => ({ ...prev, [meal.id]: e.target.value }));
+                      }}
+                      className="min-h-9 flex-1 rounded-xl border border-slate-200 bg-white/80 px-3 text-sm outline-none transition-all duration-200 focus:border-brand-yellow/60 focus:ring-4 focus:ring-brand-yellow/10 dark:border-white/10 dark:bg-white/[0.07] dark:text-white dark:backdrop-blur-md"
+                    />
+                    <button
+                      disabled={updateReminder.isPending}
+                      onClick={() => handleSaveReminder(meal)}
+                      className="shrink-0 rounded-xl border border-slate-200 bg-white/80 px-3 py-2 text-xs font-bold text-slate-700 transition hover:bg-slate-100 disabled:opacity-50 dark:border-white/10 dark:bg-white/[0.07] dark:text-white dark:hover:bg-white/[0.12]"
+                    >
+                      ذخیره
+                    </button>
+                  </div>
+                ) : null}
+              </Card>
+            ))}
         </div>
       ) : null}
     </section>
@@ -769,7 +772,7 @@ export function ProgramDetailPage() {
           {day.blocks.map((block) => (
             <div key={block.id} className="rounded-xl bg-slate-50 p-3 dark:bg-white/[0.05]">
               <p className="mb-2 text-xs font-bold text-green-700 dark:text-brand-yellow">{blockLabels[block.type]}</p>
-              {block.note ? <p className="mb-2 text-sm text-slate-500">{block.note}</p> : null}
+              {block.note ? <p className="mb-2 text-sm text-slate-50">{block.note}</p> : null}
               <div className="space-y-2">
                 {block.items.map((item) => (
                   <button
@@ -778,7 +781,7 @@ export function ProgramDetailPage() {
                     onClick={() => navigate(`/athlete/exercises/${item.exerciseId}`)}
                   >
                     <span className="block font-semibold">{item.exercise.title}</span>
-                    <span className="mt-1 block text-sm text-slate-500">
+                    <span className="mt-1 block text-sm text-slate-50">
                       ست: {item.sets} | تکرار: {item.reps}
                     </span>
                     {item.rest ? <span className="mt-1 block text-sm text-slate-600 dark:text-white/60">استراحت: {item.rest}</span> : null}
