@@ -114,25 +114,25 @@ export function CoachHomePage() {
       label: 'کل شاگردان',
       value: stats?.totalStudents ?? 0,
       icon: Users,
-      colorClass: 'bg-surface-dark/10 text-surface-dark dark:bg-brand-yellow/15 dark:text-brand-yellow',
+      colorClass: 'bg-brand-red/10 text-brand-red-strong dark:bg-brand-red/20 dark:text-brand-red-text',
     },
     {
       label: 'شاگرد جدید این ماه',
       value: stats?.newStudentsThisMonth ?? 0,
       icon: UserPlus,
-      colorClass: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-400/10 dark:text-emerald-400',
+      colorClass: 'bg-status-success/15 text-green-800 dark:bg-status-success/20 dark:text-green-300',
     },
     {
       label: 'برنامه این ماه',
       value: stats?.programsThisMonth ?? 0,
       icon: NotebookText,
-      colorClass: 'bg-blue-100 text-blue-700 dark:bg-blue-400/10 dark:text-blue-400',
+      colorClass: 'bg-status-info/15 text-blue-800 dark:bg-status-info/20 dark:text-blue-300',
     },
     {
       label: 'سوال بی‌پاسخ',
       value: stats?.unansweredQuestions ?? 0,
       icon: MessageSquare,
-      colorClass: 'bg-rose-100 text-rose-700 dark:bg-rose-400/10 dark:text-rose-400',
+      colorClass: 'bg-status-error/15 text-red-800 dark:bg-status-error/20 dark:text-red-300',
     },
   ] as const;
 
@@ -142,15 +142,15 @@ export function CoachHomePage() {
         initial={{ opacity: 0, y: -10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-        className="relative overflow-hidden rounded-2xl bg-surface-dark p-5 text-white"
+        className="relative overflow-hidden rounded-2xl border border-brand-border bg-gradient-to-br from-brand-charcoal to-brand-carbon p-5 text-brand-text-main shadow-card"
       >
-        <div className="pointer-events-none absolute -left-8 -top-8 h-36 w-36 rounded-full bg-brand-yellow/20 blur-3xl" />
-        <div className="pointer-events-none absolute -bottom-10 -right-6 h-44 w-44 rounded-full bg-brand-yellow/10 blur-3xl" />
+        <div className="pointer-events-none absolute -left-8 -top-8 h-36 w-36 rounded-full bg-brand-red/25 blur-3xl" />
+        <div className="pointer-events-none absolute -bottom-10 -right-6 h-44 w-44 rounded-full bg-brand-metallic/20 blur-3xl" />
         <div className="relative">
           <p className="text-sm text-white/50">{today}</p>
           <h1 className="mt-1 text-2xl font-black">
             سلام،{' '}
-            <span className="text-brand-yellow">{user?.fullName}</span>!
+            <span className="text-brand-red-text">{user?.fullName}</span>!
           </h1>
           <p className="mt-1 text-sm text-white/55">به پنل مربی خوش آمدید.</p>
         </div>
@@ -163,7 +163,7 @@ export function CoachHomePage() {
       </div>
 
       <div>
-        <p className="mb-3 text-xs font-bold uppercase tracking-widest text-slate-400 dark:text-white/30">دسترسی سریع</p>
+        <p className="mb-3 text-xs font-bold uppercase tracking-widest text-slate-400 dark:text-brand-text-muted">دسترسی سریع</p>
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
           <QuickActionLink to="/coach/athletes" icon={Users} label="ورزشکاران" />
           <QuickActionButton icon={UserPlus} label="ورزشکار جدید" onClick={() => setCreatingStudent(true)} />
@@ -205,11 +205,11 @@ function DashStatCard({
           <Icon className="h-5 w-5" />
         </span>
         {loading ? (
-          <div className="h-9 w-14 animate-pulse rounded-lg bg-slate-200 dark:bg-white/10" />
+          <div className="h-9 w-14 animate-pulse rounded-lg bg-slate-200 dark:bg-brand-carbon" />
         ) : (
           <p className="text-3xl font-black tabular-nums">{count.toLocaleString('fa-IR')}</p>
         )}
-        <p className="text-sm text-slate-500 dark:text-white/40">{label}</p>
+        <p className="text-sm text-slate-500 dark:text-brand-text-muted">{label}</p>
       </Card>
     </motion.div>
   );
@@ -217,8 +217,8 @@ function DashStatCard({
 
 function QuickActionLink({ to, icon: Icon, label }: { to: string; icon: LucideIcon; label: string }) {
   return (
-    <Link to={to} className="flex flex-col items-center gap-2 rounded-2xl border border-slate-200 bg-white/60 p-4 text-center transition-all duration-200 hover:border-slate-300 hover:bg-slate-50 dark:border-white/10 dark:bg-white/[0.04] dark:hover:bg-white/[0.08]">
-      <Icon className="h-6 w-6 text-slate-600 dark:text-white/70" />
+    <Link to={to} className="flex flex-col items-center gap-2 rounded-2xl border border-slate-200 bg-white/60 p-4 text-center transition-all duration-200 hover:border-slate-300 hover:bg-slate-50 dark:border-brand-border dark:bg-brand-surface-2 dark:hover:bg-brand-carbon">
+      <Icon className="h-6 w-6 text-slate-600 dark:text-brand-text-soft" />
       <span className="text-sm font-semibold">{label}</span>
     </Link>
   );
@@ -228,9 +228,9 @@ function QuickActionButton({ icon: Icon, label, onClick }: { icon: LucideIcon; l
   return (
     <button
       onClick={onClick}
-      className="flex flex-col items-center gap-2 rounded-2xl border border-slate-200 bg-white/60 p-4 text-center transition-all duration-200 hover:border-slate-300 hover:bg-slate-50 dark:border-white/10 dark:bg-white/[0.04] dark:hover:bg-white/[0.08]"
+      className="flex flex-col items-center gap-2 rounded-2xl border border-slate-200 bg-white/60 p-4 text-center transition-all duration-200 hover:border-slate-300 hover:bg-slate-50 dark:border-brand-border dark:bg-brand-surface-2 dark:hover:bg-brand-carbon"
     >
-      <Icon className="h-6 w-6 text-slate-600 dark:text-white/70" />
+      <Icon className="h-6 w-6 text-slate-600 dark:text-brand-text-soft" />
       <span className="text-sm font-semibold">{label}</span>
     </button>
   );
@@ -250,7 +250,7 @@ export function AthletesPage() {
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h1 className="text-2xl font-black">لیست ورزشکاران</h1>
-          <p className="text-sm text-slate-500 dark:text-white/40">برای دیدن جزئیات و ساخت برنامه وارد پروفایل شوید.</p>
+          <p className="text-sm text-slate-500 dark:text-brand-text-muted">برای دیدن جزئیات و ساخت برنامه وارد پروفایل شوید.</p>
         </div>
         <Button onClick={() => setCreating(true)}>
           <Plus className="h-5 w-5" />
@@ -258,12 +258,12 @@ export function AthletesPage() {
         </Button>
       </div>
 
-      <div className="rounded-2xl border border-amber-200 bg-amber-50 p-4 dark:border-amber-400/20 dark:bg-amber-400/[0.06]">
+      <div className="rounded-2xl border border-status-warning/30 bg-status-warning/10 p-4 dark:border-status-warning/40 dark:bg-status-warning/10">
         <div className="mb-3 flex items-center gap-2">
-          <Clock className="h-5 w-5 text-amber-600 dark:text-amber-400" />
-          <h2 className="font-bold text-amber-800 dark:text-amber-300">برنامه منقضی‌شده</h2>
+          <Clock className="h-5 w-5 text-status-warning dark:text-orange-300" />
+          <h2 className="font-bold text-orange-900 dark:text-orange-300">برنامه منقضی‌شده</h2>
           {!expiredLoading && expiredStudents.length > 0 ? (
-            <span className="mr-auto rounded-full bg-amber-200 px-2.5 py-0.5 text-xs font-bold text-amber-800 dark:bg-amber-400/20 dark:text-amber-300">
+            <span className="mr-auto rounded-full bg-status-warning/20 px-2.5 py-0.5 text-xs font-bold text-orange-900 dark:bg-status-warning/25 dark:text-orange-300">
               {expiredStudents.length} نفر
             </span>
           ) : null}
@@ -276,14 +276,14 @@ export function AthletesPage() {
           <div className="space-y-2">
             {expiredStudents.map((item) => (
               <Link key={item.studentId} to={`/coach/athletes/${item.studentId}`}>
-                <div className="flex items-center justify-between gap-3 rounded-xl bg-white p-3 transition hover:bg-amber-50 dark:bg-white/[0.05] dark:hover:bg-white/[0.08]">
+                <div className="flex items-center justify-between gap-3 rounded-xl bg-white p-3 transition hover:bg-amber-50 dark:bg-brand-surface-2 dark:hover:bg-brand-carbon">
                   <div className="min-w-0">
-                    <p className="font-bold text-slate-800 dark:text-white">{item.studentName}</p>
-                    <p className="truncate text-sm text-slate-500 dark:text-white/40">{item.lastProgramTitle}</p>
+                    <p className="font-bold text-slate-800 dark:text-brand-text-main">{item.studentName}</p>
+                    <p className="truncate text-sm text-slate-500 dark:text-brand-text-muted">{item.lastProgramTitle}</p>
                   </div>
                   <div className="shrink-0 text-left">
                     <p className="text-xs font-semibold text-amber-600 dark:text-amber-400">منقضی شده</p>
-                    <p className="text-xs text-slate-400 dark:text-white/30">{formatPersianDate(item.expiredAt)}</p>
+                    <p className="text-xs text-slate-400 dark:text-brand-text-muted">{formatPersianDate(item.expiredAt)}</p>
                   </div>
                 </div>
               </Link>
@@ -301,9 +301,9 @@ export function AthletesPage() {
           <Link key={student.id} to={`/coach/athletes/${student.id}`}>
             <Card className="h-full space-y-2">
               <h2 className="font-bold">{student.fullName}</h2>
-              <p className="text-sm text-slate-500 dark:text-white/40">{student.phone}</p>
+              <p className="text-sm text-slate-500 dark:text-brand-text-muted">{student.phone}</p>
               {student.studentProfile?.goal ? (
-                <span className="inline-flex rounded-full bg-brand-yellow/15 px-3 py-1 text-xs font-bold text-amber-700 dark:text-brand-yellow">
+                <span className="inline-flex rounded-full bg-brand-red/15 px-3 py-1 text-xs font-bold text-brand-red-strong dark:text-brand-red-text">
                   {student.studentProfile.goal}
                 </span>
               ) : null}
@@ -359,7 +359,7 @@ export function AthleteDetailPage() {
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
             <h1 className="text-2xl font-black">{student.fullName}</h1>
-            <p className="mt-1 text-sm text-slate-500 dark:text-white/40">{student.phone}</p>
+            <p className="mt-1 text-sm text-slate-500 dark:text-brand-text-muted">{student.phone}</p>
           </div>
           <div className="flex flex-wrap gap-2">
             <Link to={`/coach/athletes/${student.id}/new-program`}>
@@ -392,7 +392,7 @@ export function AthleteDetailPage() {
           <Info label="قد" value={student.studentProfile?.height ?? '-'} />
           <Info label="وزن" value={student.studentProfile?.weight ?? '-'} />
         </div>
-        {deleteStudent.isError ? <p className="text-sm text-rose-600">{getApiErrorMessage(deleteStudent.error)}</p> : null}
+        {deleteStudent.isError ? <p className="text-sm text-status-error dark:text-red-300">{getApiErrorMessage(deleteStudent.error)}</p> : null}
       </Card>
 
       {/* Active plan widgets */}
@@ -403,13 +403,13 @@ export function AthleteDetailPage() {
           return (
             <button
               onClick={() => setSelectedProgramId(latestProgram.id)}
-              className="group relative overflow-hidden rounded-2xl bg-surface-dark p-4 text-right text-white transition-all hover:opacity-90 active:scale-[0.98]"
+              className="group relative overflow-hidden rounded-2xl border border-brand-border bg-gradient-to-br from-brand-charcoal to-brand-carbon p-4 text-right text-brand-text-main transition-all hover:border-brand-red/50 active:scale-[0.98]"
             >
-              <div className="pointer-events-none absolute -left-6 -top-6 h-24 w-24 rounded-full bg-brand-yellow/20 blur-2xl" />
+              <div className="pointer-events-none absolute -left-6 -top-6 h-24 w-24 rounded-full bg-brand-red/25 blur-2xl" />
               <div className="relative flex flex-col gap-3">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <NotebookText className="h-4 w-4 text-brand-yellow" />
+                    <NotebookText className="h-4 w-4 text-brand-red-text" />
                     <span className="text-xs font-bold text-white/60">برنامه تمرینی</span>
                   </div>
                   <ChevronLeft className="h-4 w-4 text-white/40 transition group-hover:text-white/70" />
@@ -428,7 +428,7 @@ export function AthleteDetailPage() {
                   className={`inline-flex w-fit rounded-full px-2.5 py-0.5 text-xs font-bold ${
                     status.isExpired
                       ? 'bg-rose-400/20 text-rose-300'
-                      : 'bg-brand-yellow/20 text-brand-yellow'
+                      : 'bg-brand-red/20 text-brand-red-text'
                   }`}
                 >
                   {status.isExpired ? 'منقضی' : 'فعال'}
@@ -439,11 +439,11 @@ export function AthleteDetailPage() {
         })() : (
           <Link
             to={`/coach/athletes/${id}/new-program`}
-            className="flex flex-col items-center justify-center gap-2 rounded-2xl border-2 border-dashed border-slate-200 p-5 text-center transition hover:border-slate-300 dark:border-white/10 dark:hover:border-white/20"
+            className="flex flex-col items-center justify-center gap-2 rounded-2xl border-2 border-dashed border-slate-200 p-5 text-center transition hover:border-slate-300 dark:border-brand-border dark:hover:border-white/20"
           >
-            <NotebookText className="h-7 w-7 text-slate-300 dark:text-white/20" />
-            <p className="text-sm font-semibold text-slate-500 dark:text-white/40">برنامه تمرینی ندارد</p>
-            <span className="text-xs font-bold text-brand-yellow">+ برنامه جدید</span>
+            <NotebookText className="h-7 w-7 text-slate-300 dark:text-brand-text-muted" />
+            <p className="text-sm font-semibold text-slate-500 dark:text-brand-text-muted">برنامه تمرینی ندارد</p>
+            <span className="text-xs font-bold text-brand-red-text">+ برنامه جدید</span>
           </Link>
         )}
 
@@ -451,7 +451,7 @@ export function AthleteDetailPage() {
         {nutritionPlan ? (
           <button
             onClick={() => setShowNutritionModal(true)}
-            className="group relative overflow-hidden rounded-2xl bg-emerald-600 p-4 text-right text-white transition-all hover:opacity-90 active:scale-[0.98]"
+            className="group relative overflow-hidden rounded-2xl border border-status-success/35 bg-gradient-to-br from-brand-charcoal to-green-950/70 p-4 text-right text-brand-text-main transition-all hover:border-status-success/60 active:scale-[0.98]"
           >
             <div className="pointer-events-none absolute -left-6 -top-6 h-24 w-24 rounded-full bg-white/10 blur-2xl" />
             <div className="relative flex flex-col gap-3">
@@ -476,10 +476,10 @@ export function AthleteDetailPage() {
         ) : (
           <Link
             to="/coach/nutrition"
-            className="flex flex-col items-center justify-center gap-2 rounded-2xl border-2 border-dashed border-slate-200 p-5 text-center transition hover:border-slate-300 dark:border-white/10 dark:hover:border-white/20"
+            className="flex flex-col items-center justify-center gap-2 rounded-2xl border-2 border-dashed border-slate-200 p-5 text-center transition hover:border-slate-300 dark:border-brand-border dark:hover:border-white/20"
           >
-            <UtensilsCrossed className="h-7 w-7 text-slate-300 dark:text-white/20" />
-            <p className="text-sm font-semibold text-slate-500 dark:text-white/40">برنامه تغذیه ندارد</p>
+            <UtensilsCrossed className="h-7 w-7 text-slate-300 dark:text-brand-text-muted" />
+            <p className="text-sm font-semibold text-slate-500 dark:text-brand-text-muted">برنامه تغذیه ندارد</p>
             <span className="text-xs font-bold text-emerald-500">+ برنامه تغذیه</span>
           </Link>
         )}
@@ -491,7 +491,7 @@ export function AthleteDetailPage() {
         {programs.map((program) => (
           <Card key={program.id}>
             <h3 className="font-bold">{program.title}</h3>
-            <p className="mt-1 text-sm text-slate-500 dark:text-white/40">
+            <p className="mt-1 text-sm text-slate-500 dark:text-brand-text-muted">
               {formatPersianDate(program.createdAt)} - {program.days.length} روز
               {program.durationDays ? ` | اعتبار: ${program.durationDays} روز` : ''}
             </p>
@@ -512,23 +512,23 @@ export function AthleteDetailPage() {
             <div className="space-y-4">
               <div>
                 <h3 className="text-lg font-black">{programDetail.title}</h3>
-                <p className="text-sm text-slate-500 dark:text-white/40">
+                <p className="text-sm text-slate-500 dark:text-brand-text-muted">
                   {formatPersianDate(programDetail.createdAt)}
                   {programDetail.durationDays ? ` · اعتبار ${programDetail.durationDays} روز` : ''}
                 </p>
               </div>
               {programDetail.days.map((day) => (
-                <div key={day.id} className="rounded-xl border border-slate-200 p-3 dark:border-white/10">
+                <div key={day.id} className="rounded-xl border border-slate-200 p-3 dark:border-brand-border">
                   <p className="mb-2 font-bold">روز {day.dayNumber}</p>
                   {day.blocks.map((block) => (
-                    <div key={block.id} className="mb-2 rounded-xl bg-slate-50 p-3 dark:bg-white/[0.05]">
-                      <p className="mb-2 text-xs font-bold text-brand-yellow">{blockLabels[block.type]}</p>
+                    <div key={block.id} className="mb-2 rounded-xl bg-slate-50 p-3 dark:bg-brand-surface-2">
+                      <p className="mb-2 text-xs font-bold text-brand-red-text">{blockLabels[block.type]}</p>
                       {block.note ? <p className="mb-2 text-xs text-slate-500">{block.note}</p> : null}
                       <div className="space-y-1.5">
                         {block.items.map((item) => (
-                          <div key={item.id} className="flex items-center justify-between rounded-lg bg-white px-3 py-2 dark:bg-white/[0.07]">
+                          <div key={item.id} className="flex items-center justify-between rounded-lg bg-white px-3 py-2 dark:bg-brand-surface-2">
                             <span className="text-sm font-semibold">{item.exercise.title}</span>
-                            <span className="text-xs text-slate-500 dark:text-white/40">
+                            <span className="text-xs text-slate-500 dark:text-brand-text-muted">
                               {item.sets} ست · {item.reps}
                             </span>
                           </div>
@@ -550,19 +550,19 @@ export function AthleteDetailPage() {
             {[...nutritionPlan.meals]
               .sort((a, b) => a.order - b.order)
               .map((meal) => (
-                <div key={meal.id} className="rounded-xl border border-slate-200 p-3 dark:border-white/10">
+                <div key={meal.id} className="rounded-xl border border-slate-200 p-3 dark:border-brand-border">
                   <div className="mb-2 flex items-center justify-between gap-2">
                     <span className={`rounded-xl px-3 py-1 text-xs font-bold ${nutritionMealColors[meal.type]}`}>
                       {meal.label}
                     </span>
                     {meal.reminderTime ? (
-                      <span className="flex items-center gap-1 text-xs text-slate-400 dark:text-white/30">
+                      <span className="flex items-center gap-1 text-xs text-slate-400 dark:text-brand-text-muted">
                         <Clock className="h-3 w-3" />
                         {meal.reminderTime}
                       </span>
                     ) : null}
                   </div>
-                  <p className="whitespace-pre-line text-sm leading-7 text-slate-700 dark:text-white/70">
+                  <p className="whitespace-pre-line text-sm leading-7 text-slate-700 dark:text-brand-text-soft">
                     {meal.description}
                   </p>
                 </div>
@@ -614,8 +614,8 @@ function toDisplayText(value: unknown, fallback = '-') {
 
 function Info({ label, value }: { label: string; value: unknown }) {
   return (
-    <div className="rounded-xl bg-slate-50 p-3 dark:bg-white/[0.05]">
-      <span className="block text-xs text-slate-500 dark:text-white/40">{label}</span>
+    <div className="rounded-xl bg-slate-50 p-3 dark:bg-brand-surface-2">
+      <span className="block text-xs text-slate-500 dark:text-brand-text-muted">{label}</span>
       <strong className="mt-1 block">{toDisplayText(value)}</strong>
     </div>
   );
@@ -693,8 +693,8 @@ function StudentForm({ student, onClose }: { student?: Student; onClose: () => v
               onClick={() => setForm({ ...form, gender: g })}
               className={`flex flex-1 items-center justify-center gap-2.5 rounded-xl border py-2.5 text-sm font-semibold transition-all duration-200 ${
                 form.gender === g
-                  ? 'border-surface-dark bg-surface-dark text-white dark:border-brand-yellow dark:bg-brand-yellow dark:text-surface-dark'
-                  : 'border-slate-200 bg-white/80 text-slate-600 hover:border-slate-300 dark:border-white/10 dark:bg-white/[0.05] dark:text-white/60 dark:hover:bg-white/[0.09]'
+                  ? 'border-brand-red bg-brand-red text-white dark:border-brand-red-bright dark:bg-brand-red dark:text-brand-text-main'
+                  : 'border-stone-300 bg-stone-50/80 text-slate-600 hover:border-brand-red/40 dark:border-brand-border dark:bg-brand-surface dark:text-brand-text-soft dark:hover:border-brand-red/40 dark:hover:bg-brand-carbon'
               }`}
             >
               <img
@@ -707,8 +707,8 @@ function StudentForm({ student, onClose }: { student?: Student; onClose: () => v
           ))}
         </div>
         <Textarea rows={3} placeholder="هدف" value={form.goal} onChange={(event) => setForm({ ...form, goal: event.target.value })} />
-        {mutation.isError ? <p className="text-sm text-rose-600">{getApiErrorMessage(mutation.error)}</p> : null}
-        {mutation.data?.message ? <p className="text-sm text-emerald-600">{mutation.data.message}</p> : null}
+        {mutation.isError ? <p className="text-sm text-status-error dark:text-red-300">{getApiErrorMessage(mutation.error)}</p> : null}
+        {mutation.data?.message ? <p className="text-sm text-status-success dark:text-green-300">{mutation.data.message}</p> : null}
         <div className="flex flex-col gap-2 sm:flex-row">
           <Button className="flex-1" disabled={mutation.isPending || !form.fullName.trim() || !form.phone.trim()}>
             {mutation.isPending ? 'در حال ذخیره...' : 'ذخیره'}
@@ -778,7 +778,7 @@ export function NewProgramPage() {
     <section className="space-y-4">
       <div>
         <h1 className="text-2xl font-black">ساخت برنامه تمرینی جدید</h1>
-        <p className="text-sm text-slate-500 dark:text-white/40">{studentResponse?.data.fullName}</p>
+        <p className="text-sm text-slate-500 dark:text-brand-text-muted">{studentResponse?.data.fullName}</p>
       </div>
       <Card className="space-y-4">
         <div>
@@ -805,7 +805,7 @@ export function NewProgramPage() {
           {days.map((day) => (
             <button
               key={day.id}
-              className="rounded-xl border border-slate-200 bg-slate-50 p-4 text-right transition hover:border-brand-yellow/50 dark:border-white/10 dark:bg-white/[0.05] dark:hover:border-brand-yellow/40"
+              className="rounded-xl border border-stone-300 bg-stone-100/80 p-4 text-right transition hover:border-brand-red/50 dark:border-brand-border dark:bg-brand-surface dark:hover:border-brand-red-bright/50"
               onClick={() => setActiveDay(day)}
             >
               <span className="block font-bold">روز {day.dayNumber}</span>
@@ -813,8 +813,8 @@ export function NewProgramPage() {
             </button>
           ))}
         </div>
-        {createProgram.isError ? <p className="text-sm text-rose-600">{getApiErrorMessage(createProgram.error)}</p> : null}
-        {createProgram.data?.message ? <p className="text-sm text-emerald-600">{createProgram.data.message}</p> : null}
+        {createProgram.isError ? <p className="text-sm text-status-error dark:text-red-300">{getApiErrorMessage(createProgram.error)}</p> : null}
+        {createProgram.data?.message ? <p className="text-sm text-status-success dark:text-green-300">{createProgram.data.message}</p> : null}
         <Button className="w-full" disabled={createProgram.isPending} onClick={handleSubmit}>
           {createProgram.isPending ? 'در حال ذخیره...' : 'ذخیره برنامه'}
         </Button>
@@ -884,7 +884,7 @@ function DayExerciseModal({ day, onSave, onClose }: { day: DraftProgramDay; onSa
       <div className="space-y-4">
         {blocks.length === 0 ? <EmptyState title="هنوز حرکتی اضافه نشده است" /> : null}
         {blocks.map((block, blockIndex) => (
-          <div key={block.id} className="space-y-3 rounded-xl border border-slate-200 p-3 dark:border-white/10">
+          <div key={block.id} className="space-y-3 rounded-xl border border-slate-200 p-3 dark:border-brand-border">
             <div className="flex items-center justify-between gap-3">
               <span className="font-bold">بلوک {blockIndex + 1}</span>
               <Select className="max-w-36" value={block.type} onChange={(event) => updateBlockType(block.id, event.target.value as ExerciseBlockType)}>
@@ -897,7 +897,7 @@ function DayExerciseModal({ day, onSave, onClose }: { day: DraftProgramDay; onSa
             </div>
             <Textarea rows={2} placeholder="یادداشت این بلوک" value={block.note} onChange={(event) => updateBlockNote(block.id, event.target.value)} />
             {block.items.map((item, index) => (
-              <div key={index} className="grid gap-2 rounded-xl bg-slate-50 p-3 dark:bg-white/[0.05] sm:grid-cols-[1fr_90px_110px_110px]">
+              <div key={index} className="grid gap-2 rounded-xl bg-slate-50 p-3 dark:bg-brand-surface-2 sm:grid-cols-[1fr_90px_110px_110px]">
                 <ExercisePicker value={item.exerciseId} onChange={(exerciseId) => updateItem(block.id, index, { exerciseId })} />
                 <Input placeholder="ست" inputMode="numeric" value={item.sets} onChange={(event) => updateItem(block.id, index, { sets: event.target.value })} />
                 <Input placeholder="تکرار" value={item.reps} onChange={(event) => updateItem(block.id, index, { reps: event.target.value })} />
@@ -944,7 +944,7 @@ export function ExerciseManagementPage() {
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h1 className="text-2xl font-black">مدیریت حرکات</h1>
-          <p className="text-sm text-slate-500 dark:text-white/40">افزودن، ویرایش و حذف حرکات آموزشی.</p>
+          <p className="text-sm text-slate-500 dark:text-brand-text-muted">افزودن، ویرایش و حذف حرکات آموزشی.</p>
         </div>
         {canManage ? (
           <Button onClick={() => setCreating(true)}>
@@ -962,7 +962,7 @@ export function ExerciseManagementPage() {
             <div className="flex items-center justify-between gap-3">
               <div className="min-w-0">
                 <h2 className="font-bold">{exercise.title}</h2>
-                <p className="mt-1 line-clamp-2 text-sm leading-6 text-slate-500 dark:text-white/40">
+                <p className="mt-1 line-clamp-2 text-sm leading-6 text-slate-500 dark:text-brand-text-muted">
                   {truncateText(exercise.description, 120) || 'توضیحاتی ثبت نشده است.'}
                 </p>
               </div>
@@ -982,16 +982,16 @@ export function ExerciseManagementPage() {
       </div>
       <div ref={sentinelRef} />
       {isFetchingNextPage ? <ScrollLoader /> : null}
-      {deleteExercise.isError ? <p className="text-sm text-rose-600">{getApiErrorMessage(deleteExercise.error)}</p> : null}
-      {deleteExercise.data?.message ? <p className="text-sm text-emerald-600">{deleteExercise.data.message}</p> : null}
+      {deleteExercise.isError ? <p className="text-sm text-status-error dark:text-red-300">{getApiErrorMessage(deleteExercise.error)}</p> : null}
+      {deleteExercise.data?.message ? <p className="text-sm text-status-success dark:text-green-300">{deleteExercise.data.message}</p> : null}
       {creating ? <ExerciseForm onClose={() => setCreating(false)} /> : null}
       {editing ? <ExerciseForm exercise={editing} onClose={() => setEditing(null)} /> : null}
       {confirmDelete ? (
         <Modal title="حذف حرکت" onClose={() => setConfirmDelete(null)}>
-          <p className="mb-5 text-slate-600 dark:text-white/60">
-            آیا از حذف حرکت <span className="font-bold text-slate-800 dark:text-white">«{confirmDelete.title}»</span> مطمئن هستید؟ این عمل قابل بازگشت نیست.
+          <p className="mb-5 text-slate-600 dark:text-brand-text-soft">
+            آیا از حذف حرکت <span className="font-bold text-slate-800 dark:text-brand-text-main">«{confirmDelete.title}»</span> مطمئن هستید؟ این عمل قابل بازگشت نیست.
           </p>
-          {deleteExercise.isError ? <p className="mb-3 text-sm text-rose-600">{getApiErrorMessage(deleteExercise.error)}</p> : null}
+          {deleteExercise.isError ? <p className="mb-3 text-sm text-status-error dark:text-red-300">{getApiErrorMessage(deleteExercise.error)}</p> : null}
           <div className="flex flex-col gap-2 sm:flex-row">
             <Button
               variant="danger"
@@ -1079,32 +1079,32 @@ function ExerciseForm({ exercise, onClose }: { exercise?: Exercise; onClose: () 
           ))}
         </Select>
         <div className="space-y-1">
-          <p className="text-sm font-medium text-slate-600 dark:text-white/60">ویدیو حرکت</p>
+          <p className="text-sm font-medium text-slate-600 dark:text-brand-text-soft">ویدیو حرکت</p>
           <Input placeholder="آدرس ویدیو" value={form.videoUrl} onChange={(event) => setForm({ ...form, videoUrl: event.target.value })} />
           <input
-            className="block w-full text-sm text-slate-500 dark:text-white/40 file:ml-3 file:rounded-xl file:border-0 file:bg-slate-100 file:px-4 file:py-3 file:text-sm file:font-bold dark:file:bg-white/[0.07] dark:file:text-white"
+            className="block w-full text-sm text-slate-500 dark:text-brand-text-muted file:ml-3 file:rounded-xl file:border-0 file:bg-slate-100 file:px-4 file:py-3 file:text-sm file:font-bold dark:file:bg-brand-carbon dark:file:text-brand-text-main"
             type="file"
             accept="video/*"
             onChange={(event) => handleVideoChange(event.target.files?.[0])}
           />
           {uploadVideo.isPending ? <p className="text-sm text-slate-500">در حال آپلود ویدیو...</p> : null}
-          {uploadVideo.isError ? <p className="text-sm text-rose-600">{getApiErrorMessage(uploadVideo.error)}</p> : null}
+          {uploadVideo.isError ? <p className="text-sm text-status-error dark:text-red-300">{getApiErrorMessage(uploadVideo.error)}</p> : null}
         </div>
         <div className="space-y-1">
-          <p className="text-sm font-medium text-slate-600 dark:text-white/60">تصویر حرکت</p>
+          <p className="text-sm font-medium text-slate-600 dark:text-brand-text-soft">تصویر حرکت</p>
           <Input placeholder="آدرس تصویر" value={form.imageUrl} onChange={(event) => setForm({ ...form, imageUrl: event.target.value })} />
           <input
-            className="block w-full text-sm text-slate-500 dark:text-white/40 file:ml-3 file:rounded-xl file:border-0 file:bg-slate-100 file:px-4 file:py-3 file:text-sm file:font-bold dark:file:bg-white/[0.07] dark:file:text-white"
+            className="block w-full text-sm text-slate-500 dark:text-brand-text-muted file:ml-3 file:rounded-xl file:border-0 file:bg-slate-100 file:px-4 file:py-3 file:text-sm file:font-bold dark:file:bg-brand-carbon dark:file:text-brand-text-main"
             type="file"
             accept="image/*"
             onChange={(event) => handleImageChange(event.target.files?.[0])}
           />
           {uploadImage.isPending ? <p className="text-sm text-slate-500">در حال آپلود تصویر...</p> : null}
-          {uploadImage.isError ? <p className="text-sm text-rose-600">{getApiErrorMessage(uploadImage.error)}</p> : null}
+          {uploadImage.isError ? <p className="text-sm text-status-error dark:text-red-300">{getApiErrorMessage(uploadImage.error)}</p> : null}
         </div>
         <Textarea rows={4} placeholder="توضیحات حرکت" value={form.description} onChange={(event) => setForm({ ...form, description: event.target.value })} />
-        {mutation.isError ? <p className="text-sm text-rose-600">{getApiErrorMessage(mutation.error)}</p> : null}
-        {mutation.data?.message ? <p className="text-sm text-emerald-600">{mutation.data.message}</p> : null}
+        {mutation.isError ? <p className="text-sm text-status-error dark:text-red-300">{getApiErrorMessage(mutation.error)}</p> : null}
+        {mutation.data?.message ? <p className="text-sm text-status-success dark:text-green-300">{mutation.data.message}</p> : null}
         <div className="flex flex-col gap-2 sm:flex-row">
           <Button className="flex-1" disabled={mutation.isPending || isUploading || !form.title.trim()}>
             {mutation.isPending ? 'در حال ذخیره...' : 'ذخیره'}
@@ -1135,12 +1135,12 @@ export function QuestionsManagementPage() {
               <h2 className="font-bold">{question.student?.fullName ?? 'ورزشکار'}</h2>
               <p className="text-xs text-slate-500">{question.exercise?.title ?? 'سوال عمومی'}</p>
             </div>
-            <span className={`rounded-full px-3 py-1 text-xs font-semibold ${question.status === 'ANSWERED' ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-400/10 dark:text-emerald-400' : 'bg-amber-100 text-amber-700 dark:bg-amber-400/10 dark:text-amber-400'}`}>
+            <span className={`rounded-full px-3 py-1 text-xs font-semibold ${question.status === 'ANSWERED' ? 'bg-status-success/15 text-green-800 dark:bg-status-success/20 dark:text-green-300' : 'bg-status-warning/15 text-orange-900 dark:bg-status-warning/20 dark:text-orange-300'}`}>
               {question.status === 'ANSWERED' ? 'پاسخ داده شده' : 'در انتظار پاسخ'}
             </span>
           </div>
-          <p className="text-sm leading-7 text-slate-700 dark:text-white/70">{question.question}</p>
-          {question.answer ? <p className="rounded-xl bg-slate-100 p-3 text-sm leading-7 dark:bg-white/[0.07]">{question.answer}</p> : null}
+          <p className="text-sm leading-7 text-slate-700 dark:text-brand-text-soft">{question.question}</p>
+          {question.answer ? <p className="rounded-xl bg-slate-100 p-3 text-sm leading-7 dark:bg-brand-surface-2">{question.answer}</p> : null}
           <AnswerQuestionForm id={question.id} />
         </Card>
       ))}
@@ -1167,8 +1167,8 @@ function AnswerQuestionForm({ id }: { id: string }) {
   return (
     <form className="space-y-2" onSubmit={handleSubmit}>
       <Textarea rows={3} placeholder="پاسخ مربی" value={answer} onChange={(event) => setAnswer(event.target.value)} />
-      {answerQuestion.isError ? <p className="text-sm text-rose-600">{getApiErrorMessage(answerQuestion.error)}</p> : null}
-      {answerQuestion.data?.message ? <p className="text-sm text-emerald-600">{answerQuestion.data.message}</p> : null}
+      {answerQuestion.isError ? <p className="text-sm text-status-error dark:text-red-300">{getApiErrorMessage(answerQuestion.error)}</p> : null}
+      {answerQuestion.data?.message ? <p className="text-sm text-status-success dark:text-green-300">{answerQuestion.data.message}</p> : null}
       <Button disabled={answerQuestion.isPending || !answer.trim()}>
         <Send className="h-4 w-4" />
         {answerQuestion.isPending ? 'در حال ارسال...' : 'ارسال پاسخ'}
@@ -1227,7 +1227,7 @@ const nutritionMealColors: Record<MealType, string> = {
   BREAKFAST: 'bg-orange-100 text-orange-700 dark:bg-orange-400/10 dark:text-orange-400',
   LUNCH: 'bg-amber-100 text-amber-700 dark:bg-amber-400/10 dark:text-amber-400',
   DINNER: 'bg-indigo-100 text-indigo-700 dark:bg-indigo-400/10 dark:text-indigo-400',
-  SNACK: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-400/10 dark:text-emerald-400',
+  SNACK: 'bg-status-success/15 text-green-800 dark:bg-status-success/20 dark:text-green-300',
 };
 
 const STEP_LABELS = ['انتخاب وعده‌ها', 'محتوای وعده‌ها', 'پیش‌نمایش'] as const;
@@ -1282,12 +1282,12 @@ export function NutritionPlanPage() {
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-          className="flex flex-col items-center gap-4 rounded-2xl border border-emerald-200 bg-emerald-50 p-8 text-center dark:border-emerald-400/20 dark:bg-emerald-400/[0.06]"
+          className="flex flex-col items-center gap-4 rounded-2xl border border-status-success/30 bg-status-success/10 p-8 text-center dark:border-status-success/40 dark:bg-status-success/10"
         >
-          <CheckCircle2 className="h-12 w-12 text-emerald-500" />
+          <CheckCircle2 className="h-12 w-12 text-status-success" />
           <div>
-            <h2 className="text-xl font-black text-emerald-800 dark:text-emerald-300">برنامه تغذیه ثبت شد</h2>
-            <p className="mt-1 text-sm text-emerald-600 dark:text-emerald-400">برنامه غذایی با موفقیت برای ورزشکار ایجاد شد.</p>
+            <h2 className="text-xl font-black text-green-900 dark:text-green-300">برنامه تغذیه ثبت شد</h2>
+            <p className="mt-1 text-sm text-status-success dark:text-green-300">برنامه غذایی با موفقیت برای ورزشکار ایجاد شد.</p>
           </div>
           <div className="flex gap-3">
             <Link to={`/coach/athletes/${studentId}`}>
@@ -1306,7 +1306,7 @@ export function NutritionPlanPage() {
     <section className="space-y-5">
       <div>
         <h1 className="text-2xl font-black">ایجاد برنامه تغذیه</h1>
-        <p className="text-sm text-slate-500 dark:text-white/40">برنامه غذایی اختصاصی برای ورزشکار بسازید.</p>
+        <p className="text-sm text-slate-500 dark:text-brand-text-muted">برنامه غذایی اختصاصی برای ورزشکار بسازید.</p>
       </div>
 
       {/* Step indicator */}
@@ -1316,23 +1316,23 @@ export function NutritionPlanPage() {
             <div
               className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs font-bold transition-colors ${
                 i < idx
-                  ? 'bg-surface-dark text-white dark:bg-brand-yellow dark:text-surface-dark'
+                  ? 'bg-brand-red text-white dark:bg-brand-red dark:text-brand-text-main'
                   : i === idx
-                    ? 'bg-surface-dark text-white dark:bg-brand-yellow dark:text-surface-dark'
-                    : 'bg-slate-200 text-slate-500 dark:bg-white/10 dark:text-white/40'
+                    ? 'bg-brand-red text-white dark:bg-brand-red dark:text-brand-text-main'
+                    : 'bg-stone-300 text-slate-500 dark:bg-brand-carbon dark:text-brand-text-muted'
               }`}
             >
               {i < idx ? <Check className="h-3.5 w-3.5" /> : toPersianNum(i + 1)}
             </div>
             <span
               className={`hidden text-xs font-semibold sm:block ${
-                i === idx ? 'text-slate-800 dark:text-white' : 'text-slate-400 dark:text-white/40'
+                i === idx ? 'text-slate-800 dark:text-brand-text-main' : 'text-slate-400 dark:text-brand-text-muted'
               }`}
             >
               {label}
             </span>
             {i < STEP_LABELS.length - 1 ? (
-              <div className={`mx-1 h-px w-6 shrink-0 sm:w-10 ${i < idx ? 'bg-surface-dark dark:bg-brand-yellow' : 'bg-slate-200 dark:bg-white/10'}`} />
+              <div className={`mx-1 h-px w-6 shrink-0 sm:w-10 ${i < idx ? 'bg-brand-red dark:bg-brand-red-bright' : 'bg-stone-300 dark:bg-brand-border'}`} />
             ) : null}
           </div>
         ))}
@@ -1363,8 +1363,8 @@ export function NutritionPlanPage() {
                   onClick={() => setSelected((prev) => ({ ...prev, [key]: !prev[key] }))}
                   className={`flex-1 rounded-xl border py-3 text-sm font-bold transition-all duration-200 ${
                     selected[key]
-                      ? 'border-surface-dark bg-surface-dark text-white dark:border-brand-yellow dark:bg-brand-yellow dark:text-surface-dark'
-                      : 'border-slate-200 bg-white/80 text-slate-600 hover:border-slate-300 dark:border-white/10 dark:bg-white/[0.05] dark:text-white/60'
+                      ? 'border-brand-red bg-brand-red text-white dark:border-brand-red-bright dark:bg-brand-red dark:text-brand-text-main'
+                      : 'border-stone-300 bg-stone-50/80 text-slate-600 hover:border-brand-red/40 dark:border-brand-border dark:bg-brand-surface dark:text-brand-text-soft'
                   }`}
                 >
                   {label}
@@ -1439,11 +1439,11 @@ export function NutritionPlanPage() {
                 <span className={`inline-flex rounded-xl px-3 py-1 text-xs font-bold ${nutritionMealColors[meal.type]}`}>
                   {meal.label}
                 </span>
-                <p className="whitespace-pre-line text-sm leading-7 text-slate-700 dark:text-white/70">{meal.description}</p>
+                <p className="whitespace-pre-line text-sm leading-7 text-slate-700 dark:text-brand-text-soft">{meal.description}</p>
               </Card>
             ))}
           </div>
-          {isError ? <p className="text-sm text-rose-600">{getApiErrorMessage(error)}</p> : null}
+          {isError ? <p className="text-sm text-status-error dark:text-red-300">{getApiErrorMessage(error)}</p> : null}
           <div className="flex gap-2">
             <Button variant="secondary" onClick={() => setStep('fill')}>
               <ChevronRight className="h-4 w-4" />
@@ -1479,8 +1479,8 @@ function NutritionSnackPicker({
             onClick={() => onChange(n)}
             className={`h-10 flex-1 rounded-xl border text-sm font-bold transition-all duration-200 ${
               value === n
-                ? 'border-surface-dark bg-surface-dark text-white dark:border-brand-yellow dark:bg-brand-yellow dark:text-surface-dark'
-                : 'border-slate-200 bg-white/80 text-slate-600 hover:border-slate-300 dark:border-white/10 dark:bg-white/[0.05] dark:text-white/60'
+                ? 'border-brand-red bg-brand-red text-white dark:border-brand-red-bright dark:bg-brand-red dark:text-brand-text-main'
+                : 'border-stone-300 bg-stone-50/80 text-slate-600 hover:border-brand-red/40 dark:border-brand-border dark:bg-brand-surface dark:text-brand-text-soft'
             }`}
           >
             {toPersianNum(n)}
@@ -1508,15 +1508,15 @@ export function NotificationsPage() {
     <section className="space-y-4">
       <div>
         <h1 className="text-2xl font-black">ارسال اعلان</h1>
-        <p className="text-sm text-slate-500 dark:text-white/40">payload برای push، sms و email آماده ارسال است.</p>
+        <p className="text-sm text-slate-500 dark:text-brand-text-muted">payload برای push، sms و email آماده ارسال است.</p>
       </div>
       <Card>
         <form className="space-y-3" onSubmit={handleSubmit}>
           <Input placeholder="شناسه کاربر (اختیاری)" value={form.userId} onChange={(event) => setForm({ ...form, userId: event.target.value })} />
           <Input placeholder="عنوان" value={form.title} onChange={(event) => setForm({ ...form, title: event.target.value })} required />
           <Textarea rows={4} placeholder="متن پیام" value={form.body} onChange={(event) => setForm({ ...form, body: event.target.value })} required />
-          {sendNotification.isError ? <p className="text-sm text-rose-600">{getApiErrorMessage(sendNotification.error)}</p> : null}
-          {sendNotification.data?.message ? <p className="text-sm text-emerald-600">{sendNotification.data.message}</p> : null}
+          {sendNotification.isError ? <p className="text-sm text-status-error dark:text-red-300">{getApiErrorMessage(sendNotification.error)}</p> : null}
+          {sendNotification.data?.message ? <p className="text-sm text-status-success dark:text-green-300">{sendNotification.data.message}</p> : null}
           <Button disabled={sendNotification.isPending || !form.title.trim() || !form.body.trim()}>
             <Send className="h-4 w-4" />
             {sendNotification.isPending ? 'در حال ارسال...' : 'ارسال'}

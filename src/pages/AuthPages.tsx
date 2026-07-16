@@ -101,13 +101,13 @@ const validateStudentRegisterForm = (form: StudentRegisterForm) => {
 function FieldError({ message }: { message?: string }) {
   if (!message) return null;
 
-  return <p className="mt-1 text-xs font-medium text-rose-600 dark:text-rose-300">{message}</p>;
+  return <p className="mt-1 text-xs font-medium text-status-error dark:text-red-300">{message}</p>;
 }
 
 function KeyboardLanguageHint({ visible }: { visible: boolean }) {
   if (!visible) return null;
 
-  return <p className="mt-1 text-xs font-medium text-amber-600 dark:text-amber-300">{englishKeyboardHint}</p>;
+  return <p className="mt-1 text-xs font-medium text-status-warning dark:text-orange-300">{englishKeyboardHint}</p>;
 }
 
 export function LandingPage() {
@@ -122,12 +122,12 @@ export function LandingPage() {
       <Card className="space-y-5">
         <div className="flex items-center">
           <div className="flex items-center gap-3">
-            <span className="grid h-12 w-12 place-items-center rounded-xl bg-brand-yellow shadow-glow-sm">
-              <Dumbbell className="h-6 w-6 text-surface-dark" />
+            <span className="grid h-12 w-12 place-items-center rounded-xl border border-brand-red-bright/40 bg-brand-red shadow-glow-sm">
+              <Dumbbell className="h-6 w-6 text-brand-text-main" />
             </span>
             <div>
               <h1 className="text-xl font-black">Bahman Coach</h1>
-              <p className="text-sm text-slate-500 dark:text-white/40">مدیریت تمرین، ورزشکار و پرسش ها</p>
+            <p className="text-sm text-slate-500 dark:text-brand-text-muted">مدیریت تمرین، ورزشکار و پرسش ها</p>
             </div>
           </div>
         </div>
@@ -189,7 +189,7 @@ export function LoginPage({ mode }: { mode: 'student' | 'staff' }) {
         <div>
           <div>
             <h1 className="text-2xl font-black">{isStaff ? 'ورود مربی / ادمین' : 'ورود ورزشکار'}</h1>
-            <p className="mt-1 text-sm text-slate-500 dark:text-white/40">شماره موبایل و رمز عبور خود را وارد کنید.</p>
+            <p className="mt-1 text-sm text-slate-500 dark:text-brand-text-muted">شماره موبایل و رمز عبور خود را وارد کنید.</p>
           </div>
         </div>
         <form className="space-y-3" onSubmit={handleSubmit}>
@@ -213,12 +213,12 @@ export function LoginPage({ mode }: { mode: 'student' | 'staff' }) {
             <KeyboardLanguageHint visible={keyboardHintField === 'password'} />
           </div>
           {login.isError ? (
-            <p className="rounded-lg bg-rose-50 px-3 py-2 text-sm text-rose-700 dark:bg-rose-500/10 dark:text-rose-300">
+            <p className="rounded-lg border border-status-error/20 bg-status-error/10 px-3 py-2 text-sm text-red-800 dark:border-status-error/30 dark:bg-status-error/10 dark:text-red-300">
               {getApiErrorMessage(login.error)}
             </p>
           ) : null}
           {login.data?.message ? (
-            <p className="rounded-lg bg-emerald-50 px-3 py-2 text-sm text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-300">
+            <p className="rounded-lg border border-status-success/20 bg-status-success/10 px-3 py-2 text-sm text-green-800 dark:border-status-success/30 dark:bg-status-success/10 dark:text-green-300">
               {login.data.message}
             </p>
           ) : null}
@@ -227,9 +227,9 @@ export function LoginPage({ mode }: { mode: 'student' | 'staff' }) {
           </Button>
         </form>
         {!isStaff ? (
-          <div className="border-t border-slate-100 pt-4 text-center text-sm dark:border-white/10">
-            <span className="text-slate-500 dark:text-white/40">هنوز حساب ورزشکاری ندارید؟ </span>
-            <Link className="font-bold text-green-700 dark:text-brand-yellow" to="/register">
+          <div className="border-t border-stone-300 pt-4 text-center text-sm dark:border-brand-border">
+            <span className="text-slate-500 dark:text-brand-text-muted">هنوز حساب ورزشکاری ندارید؟ </span>
+            <Link className="font-bold text-brand-red-strong dark:text-brand-red-text" to="/register">
               ثبت نام شاگرد
             </Link>
           </div>
@@ -306,12 +306,12 @@ export function StudentRegisterPage() {
       <Card className="space-y-5">
         <div className="flex items-start gap-4">
           <div className="flex items-start gap-3">
-            <span className="grid h-12 w-12 shrink-0 place-items-center rounded-xl bg-brand-yellow shadow-glow-sm">
-              <UserPlus className="h-6 w-6 text-surface-dark" />
+            <span className="grid h-12 w-12 shrink-0 place-items-center rounded-xl border border-brand-red-bright/40 bg-brand-red shadow-glow-sm">
+              <UserPlus className="h-6 w-6 text-brand-text-main" />
             </span>
             <div>
               <h1 className="text-2xl font-black">ثبت نام شاگرد</h1>
-              <p className="mt-1 text-sm leading-6 text-slate-500 dark:text-white/40">
+              <p className="mt-1 text-sm leading-6 text-slate-500 dark:text-brand-text-muted">
                 اطلاعات اولیه خود را وارد کنید تا حساب ورزشکاری شما ساخته شود.
               </p>
             </div>
@@ -417,8 +417,8 @@ export function StudentRegisterPage() {
                 onClick={() => setForm({ ...form, gender: g })}
                 className={`flex flex-1 items-center justify-center gap-2.5 rounded-xl border py-3 text-sm font-semibold transition-all duration-200 ${
                   form.gender === g
-                    ? 'border-surface-dark bg-surface-dark text-white dark:border-brand-yellow dark:bg-brand-yellow dark:text-surface-dark'
-                    : 'border-slate-200 bg-white/80 text-slate-600 hover:border-slate-300 dark:border-white/10 dark:bg-white/[0.05] dark:text-white/60 dark:hover:bg-white/[0.09]'
+                    ? 'border-brand-red bg-brand-red text-white dark:border-brand-red-bright dark:bg-brand-red dark:text-brand-text-main'
+                    : 'border-stone-300 bg-stone-50/80 text-slate-600 hover:border-brand-red/40 dark:border-brand-border dark:bg-brand-surface dark:text-brand-text-soft dark:hover:border-brand-red/40 dark:hover:bg-brand-carbon'
                 }`}
               >
                 <img
@@ -442,12 +442,12 @@ export function StudentRegisterPage() {
             <FieldError message={visibleErrors.goal} />
           </div>
           {registerStudent.isError ? (
-            <p className="rounded-lg bg-rose-50 px-3 py-2 text-sm text-rose-700 dark:bg-rose-500/10 dark:text-rose-300">
+            <p className="rounded-lg border border-status-error/20 bg-status-error/10 px-3 py-2 text-sm text-red-800 dark:border-status-error/30 dark:bg-status-error/10 dark:text-red-300">
               {getApiErrorMessage(registerStudent.error)}
             </p>
           ) : null}
           {registerStudent.data?.message ? (
-            <p className="rounded-lg bg-emerald-50 px-3 py-2 text-sm text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-300">
+            <p className="rounded-lg border border-status-success/20 bg-status-success/10 px-3 py-2 text-sm text-green-800 dark:border-status-success/30 dark:bg-status-success/10 dark:text-green-300">
               {registerStudent.data.message}
             </p>
           ) : null}
@@ -456,9 +456,9 @@ export function StudentRegisterPage() {
           </Button>
         </form>
 
-        <div className="border-t border-slate-100 pt-4 text-center text-sm dark:border-white/10">
-          <span className="text-slate-500 dark:text-white/40">قبلا ثبت نام کرده اید؟ </span>
-          <Link className="font-bold text-green-700 dark:text-brand-yellow" to="/login">
+        <div className="border-t border-stone-300 pt-4 text-center text-sm dark:border-brand-border">
+          <span className="text-slate-500 dark:text-brand-text-muted">قبلا ثبت نام کرده اید؟ </span>
+          <Link className="font-bold text-brand-red-strong dark:text-brand-red-text" to="/login">
             ورود ورزشکار
           </Link>
         </div>

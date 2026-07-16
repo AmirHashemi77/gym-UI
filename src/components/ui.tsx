@@ -11,16 +11,16 @@ export function Button({
 }: React.ButtonHTMLAttributes<HTMLButtonElement> & { variant?: 'primary' | 'secondary' | 'ghost' | 'danger' }) {
   const styles = {
     primary:
-      'bg-brand-yellow text-surface-dark hover:opacity-90 font-bold shadow-glow-sm',
+      'border border-brand-red-bright/50 bg-brand-red text-brand-text-main hover:bg-brand-red-strong font-bold shadow-glow-sm',
     secondary:
-      'bg-white/10 text-slate-800 border border-slate-200 hover:bg-slate-100 dark:bg-white/[0.07] dark:text-white dark:border-white/10 dark:hover:bg-white/[0.12] backdrop-blur-md',
+      'border border-slate-300 bg-white/70 text-brand-charcoal hover:border-brand-red/50 hover:bg-stone-100 dark:border-brand-border dark:bg-brand-carbon/90 dark:text-brand-text-main dark:hover:border-brand-red-bright/60 dark:hover:bg-brand-stone backdrop-blur-md',
     ghost:
-      'text-slate-600 hover:bg-slate-100/70 dark:text-white/70 dark:hover:bg-white/[0.07]',
-    danger: 'bg-rose-600 text-white hover:bg-rose-700',
+      'text-slate-600 hover:bg-brand-red/10 hover:text-brand-red-strong dark:text-brand-text-soft dark:hover:bg-brand-red/15 dark:hover:text-brand-text-main',
+    danger: 'border border-brand-red-bright/60 bg-brand-red-bright text-white hover:bg-brand-red-strong',
   };
   return (
     <button
-      className={`inline-flex min-h-11 items-center justify-center gap-2 rounded-xl px-4 text-sm font-semibold transition-all duration-200 active:scale-[0.97] disabled:cursor-not-allowed disabled:opacity-50 ${styles[variant]} ${className}`}
+      className={`inline-flex min-h-11 items-center justify-center gap-2 rounded-xl px-4 text-sm font-semibold transition-all duration-200 active:scale-[0.97] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-brand-red-bright/25 disabled:cursor-not-allowed disabled:opacity-50 ${styles[variant]} ${className}`}
       {...props}
     >
       {children}
@@ -42,7 +42,7 @@ export function Card({
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1], delay }}
-      className={`rounded-2xl border border-slate-200/80 bg-white/80 p-4 shadow-card backdrop-blur-md dark:border-white/10 dark:bg-white/[0.07] dark:shadow-black/20 ${className}`}
+      className={`rounded-2xl border border-stone-300/80 bg-stone-50/90 p-4 shadow-card backdrop-blur-md dark:border-brand-border dark:bg-brand-surface-2/90 dark:shadow-black/40 ${className}`}
     >
       {children}
     </motion.div>
@@ -52,7 +52,7 @@ export function Card({
 export function Input({ className = '', ...props }: React.InputHTMLAttributes<HTMLInputElement>) {
   return (
     <input
-      className={`min-h-11 w-full rounded-xl border border-slate-200 bg-white/80 px-3 text-sm outline-none transition-all duration-200 placeholder:text-slate-400 focus:border-brand-yellow/60 focus:ring-4 focus:ring-brand-yellow/10 dark:border-white/10 dark:bg-white/[0.07] dark:text-white dark:placeholder:text-white/30 dark:focus:border-brand-yellow/50 dark:backdrop-blur-md ${className}`}
+      className={`min-h-11 w-full rounded-xl border border-stone-300 bg-stone-50/90 px-3 text-sm text-brand-charcoal outline-none transition-all duration-200 placeholder:text-slate-500 focus:border-brand-red/70 focus:ring-4 focus:ring-brand-red/10 dark:border-brand-border dark:bg-brand-surface dark:text-brand-text-main dark:placeholder:text-brand-text-muted dark:focus:border-brand-red-bright/70 dark:focus:ring-brand-red/20 dark:backdrop-blur-md ${className}`}
       {...props}
     />
   );
@@ -71,7 +71,7 @@ export function PasswordInput({ className = '', ...props }: Omit<React.InputHTML
       />
       <button
         type="button"
-        className="absolute left-1 top-1/2 grid h-9 w-9 -translate-y-1/2 place-items-center rounded-lg text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-yellow/60 dark:text-white/40 dark:hover:bg-white/10 dark:hover:text-white/70"
+        className="absolute left-1 top-1/2 grid h-9 w-9 -translate-y-1/2 place-items-center rounded-lg text-slate-500 transition-colors hover:bg-brand-red/10 hover:text-brand-red dark:text-brand-text-muted dark:hover:bg-brand-red/15 dark:hover:text-brand-red-text focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-red-bright/60"
         onClick={() => setIsPasswordVisible((visible) => !visible)}
         aria-label={toggleLabel}
         title={toggleLabel}
@@ -86,7 +86,7 @@ export function PasswordInput({ className = '', ...props }: Omit<React.InputHTML
 export function Textarea({ className = '', ...props }: React.TextareaHTMLAttributes<HTMLTextAreaElement>) {
   return (
     <textarea
-      className={`w-full rounded-xl border border-slate-200 bg-white/80 px-3 py-3 text-sm outline-none transition-all duration-200 placeholder:text-slate-400 focus:border-brand-yellow/60 focus:ring-4 focus:ring-brand-yellow/10 dark:border-white/10 dark:bg-white/[0.07] dark:text-white dark:placeholder:text-white/30 dark:backdrop-blur-md ${className}`}
+      className={`w-full rounded-xl border border-stone-300 bg-stone-50/90 px-3 py-3 text-sm text-brand-charcoal outline-none transition-all duration-200 placeholder:text-slate-500 focus:border-brand-red/70 focus:ring-4 focus:ring-brand-red/10 dark:border-brand-border dark:bg-brand-surface dark:text-brand-text-main dark:placeholder:text-brand-text-muted dark:focus:border-brand-red-bright/70 dark:focus:ring-brand-red/20 dark:backdrop-blur-md ${className}`}
       {...props}
     />
   );
@@ -95,7 +95,7 @@ export function Textarea({ className = '', ...props }: React.TextareaHTMLAttribu
 export function Select({ className = '', ...props }: React.SelectHTMLAttributes<HTMLSelectElement>) {
   return (
     <select
-      className={`min-h-11 w-full rounded-xl border border-slate-200 bg-white/80 px-3 text-sm outline-none transition-all duration-200 focus:border-brand-yellow/60 focus:ring-4 focus:ring-brand-yellow/10 dark:border-white/10 dark:bg-white/[0.07] dark:text-white dark:backdrop-blur-md ${className}`}
+      className={`min-h-11 w-full rounded-xl border border-stone-300 bg-stone-50/90 px-3 text-sm text-brand-charcoal outline-none transition-all duration-200 focus:border-brand-red/70 focus:ring-4 focus:ring-brand-red/10 dark:border-brand-border dark:bg-brand-surface dark:text-brand-text-main dark:focus:border-brand-red-bright/70 dark:focus:ring-brand-red/20 dark:backdrop-blur-md ${className}`}
       {...props}
     />
   );
@@ -104,7 +104,7 @@ export function Select({ className = '', ...props }: React.SelectHTMLAttributes<
 export function SearchBox(props: React.InputHTMLAttributes<HTMLInputElement>) {
   return (
     <div className="relative">
-      <Search className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400 dark:text-white/30" />
+      <Search className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500 dark:text-brand-text-muted" />
       <Input className="pr-10" {...props} />
     </div>
   );
@@ -115,7 +115,7 @@ export function ThemeToggle() {
   const toggleTheme = useAppStore((state) => state.toggleTheme);
   return (
     <button
-      className="grid h-12 w-12 place-items-center rounded-xl text-slate-600 transition hover:bg-slate-100/70 dark:text-white/70 dark:hover:bg-white/[0.07]"
+      className="grid h-12 w-12 place-items-center rounded-xl text-slate-600 transition hover:bg-brand-red/10 hover:text-brand-red dark:text-brand-text-soft dark:hover:bg-brand-red/15 dark:hover:text-brand-red-text"
       onClick={toggleTheme}
       aria-label="تغییر تم"
     >
@@ -139,7 +139,7 @@ export function Modal({
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        className="fixed inset-0 z-50 grid place-items-end bg-black/50 backdrop-blur-sm p-0 sm:place-items-center sm:p-4"
+        className="fixed inset-0 z-50 grid place-items-end bg-brand-black/80 backdrop-blur-sm p-0 sm:place-items-center sm:p-4"
         onClick={(e) => e.target === e.currentTarget && onClose()}
       >
         <motion.div
@@ -147,12 +147,12 @@ export function Modal({
           animate={{ y: 0, opacity: 1 }}
           exit={{ y: 48, opacity: 0 }}
           transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
-          className="max-h-[92vh] w-full overflow-y-auto rounded-t-3xl border border-white/10 bg-white/95 p-5 shadow-2xl backdrop-blur-xl dark:bg-surface-dark/90 sm:max-w-2xl sm:rounded-2xl"
+          className="max-h-[92vh] w-full overflow-y-auto rounded-t-3xl border border-stone-300 bg-stone-50/95 p-5 shadow-2xl backdrop-blur-xl dark:border-brand-border dark:bg-brand-surface/95 sm:max-w-2xl sm:rounded-2xl"
         >
           <div className="mb-5 flex items-center justify-between">
-            <h2 className="text-lg font-bold dark:text-white">{title}</h2>
+            <h2 className="text-lg font-bold dark:text-brand-text-main">{title}</h2>
             <button
-              className="grid h-9 w-9 place-items-center rounded-xl text-slate-500 transition hover:bg-slate-100 dark:text-white/50 dark:hover:bg-white/[0.07]"
+              className="grid h-9 w-9 place-items-center rounded-xl text-slate-500 transition hover:bg-brand-red/10 hover:text-brand-red dark:text-brand-text-muted dark:hover:bg-brand-red/15 dark:hover:text-brand-red-text"
               onClick={onClose}
               aria-label="بستن"
             >
@@ -171,10 +171,10 @@ export function EmptyState({ title, caption }: { title: string; caption?: string
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      className="rounded-2xl border border-dashed border-slate-300 p-8 text-center dark:border-white/10"
+      className="rounded-2xl border border-dashed border-stone-400 p-8 text-center dark:border-brand-border"
     >
-      <p className="font-semibold text-slate-700 dark:text-white/70">{title}</p>
-      {caption ? <p className="mt-1 text-sm text-slate-500 dark:text-white/40">{caption}</p> : null}
+      <p className="font-semibold text-slate-700 dark:text-brand-text-soft">{title}</p>
+      {caption ? <p className="mt-1 text-sm text-slate-500 dark:text-brand-text-muted">{caption}</p> : null}
     </motion.div>
   );
 }
@@ -182,7 +182,7 @@ export function EmptyState({ title, caption }: { title: string; caption?: string
 export function ScrollLoader() {
   return (
     <div className="flex justify-center py-5">
-      <div className="h-5 w-5 animate-spin rounded-full border-2 border-slate-300 border-t-surface-dark dark:border-white/20 dark:border-t-brand-yellow" />
+      <div className="h-5 w-5 animate-spin rounded-full border-2 border-stone-300 border-t-brand-red dark:border-brand-border dark:border-t-brand-red-bright" />
     </div>
   );
 }

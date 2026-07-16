@@ -9,7 +9,7 @@ export function GlobalLoadingSpinner() {
     <AnimatePresence>
       {isLoading ? (
         <motion.div
-          className="fixed inset-0 z-[100] grid place-items-center bg-slate-950/25 p-4 backdrop-blur-[2px]"
+          className="fixed inset-0 z-[100] grid place-items-center bg-brand-black/70 p-4 backdrop-blur-[2px]"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
@@ -19,18 +19,18 @@ export function GlobalLoadingSpinner() {
           aria-label="در حال بارگذاری"
         >
           <motion.div
-            className="flex min-w-40 flex-col items-center gap-3 rounded-2xl border border-white/70 bg-white/95 px-7 py-6 shadow-2xl dark:border-white/10 dark:bg-surface-dark/95"
+            className="flex min-w-40 flex-col items-center gap-3 rounded-2xl border border-stone-300 bg-stone-50/95 px-7 py-6 shadow-2xl dark:border-brand-border dark:bg-brand-surface/95"
             initial={{ opacity: 0, scale: 0.92, y: 8 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.96, y: 4 }}
             transition={{ duration: 0.2 }}
           >
             <div className="relative h-12 w-12">
-              <div className="absolute inset-0 rounded-full border-4 border-slate-200 dark:border-white/10" />
-              <div className="absolute inset-0 animate-spin rounded-full border-4 border-transparent border-t-brand-yellow border-r-brand-yellow motion-reduce:animate-none" />
-              <div className="absolute inset-[14px] animate-pulse rounded-full bg-brand-yellow shadow-glow-sm motion-reduce:animate-none" />
+              <div className="absolute inset-0 rounded-full border-4 border-stone-300 dark:border-brand-border" />
+              <div className="absolute inset-0 animate-spin rounded-full border-4 border-transparent border-r-brand-red-bright border-t-brand-red-bright motion-reduce:animate-none" />
+              <div className="absolute inset-[14px] animate-pulse rounded-full bg-brand-red shadow-glow-sm motion-reduce:animate-none" />
             </div>
-            <p className="text-sm font-bold text-slate-700 dark:text-white/80">در حال بارگذاری...</p>
+            <p className="text-sm font-bold text-slate-700 dark:text-brand-text-soft">در حال بارگذاری...</p>
           </motion.div>
         </motion.div>
       ) : null}

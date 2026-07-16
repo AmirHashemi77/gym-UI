@@ -13,19 +13,19 @@ export function ExercisePicker({ value, onChange }: { value: string; onChange: (
     <div className="space-y-2">
       <Input placeholder="نام حرکت را تایپ کنید" value={selected?.title ?? term} onChange={(event) => setTerm(event.target.value)} />
       {term ? (
-        <div className="max-h-40 overflow-y-auto rounded-xl border border-slate-200 bg-white p-1 dark:border-white/10 dark:bg-white/[0.07] dark:backdrop-blur-md">
+        <div className="max-h-40 overflow-y-auto rounded-xl border border-stone-300 bg-stone-50 p-1 dark:border-brand-border dark:bg-brand-surface dark:backdrop-blur-md">
           {exercises.map((exercise) => (
             <button
               key={exercise.id}
               type="button"
-              className="block w-full rounded-lg px-3 py-2 text-right text-sm transition hover:bg-slate-100 dark:hover:bg-white/[0.07]"
+              className="block w-full rounded-lg px-3 py-2 text-right text-sm transition hover:bg-brand-red/10 hover:text-brand-red-strong dark:hover:bg-brand-red/15 dark:hover:text-brand-red-text"
               onClick={() => {
                 onChange(exercise.id);
                 setTerm('');
               }}
             >
               <span className="block font-medium">{exercise.title}</span>
-              <span className="mt-1 block text-xs leading-5 text-slate-500 dark:text-white/40">{truncateText(exercise.description, 80) || 'توضیحاتی ثبت نشده است.'}</span>
+              <span className="mt-1 block text-xs leading-5 text-slate-500 dark:text-brand-text-muted">{truncateText(exercise.description, 80) || 'توضیحاتی ثبت نشده است.'}</span>
             </button>
           ))}
         </div>

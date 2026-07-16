@@ -8,7 +8,7 @@ import { Button } from './ui';
 
 export function AuthLayout({ children, size = 'default' }: { children: ReactNode; size?: 'default' | 'wide' }) {
   return (
-    <main className="min-h-screen text-slate-950 dark:text-white">
+    <main className="min-h-screen text-brand-charcoal dark:text-brand-text-main">
       <div
         className={`mx-auto flex min-h-screen w-full flex-col justify-center px-5 py-8 ${
           size === 'wide' ? 'max-w-2xl' : 'max-w-md'
@@ -49,21 +49,21 @@ export function ProtectedLayout() {
   const homePath = isStudent ? '/athlete' : '/coach';
 
   return (
-    <div className="min-h-screen overflow-x-hidden pb-28 text-slate-950 dark:text-white md:pb-0">
-      <header className="sticky top-0 z-30 border-b border-slate-200/60 bg-white/70 backdrop-blur-xl dark:border-white/[0.08] dark:bg-surface-dark/60">
+    <div className="min-h-screen overflow-x-hidden pb-28 text-brand-charcoal dark:text-brand-text-main md:pb-0">
+      <header className="sticky top-0 z-30 border-b border-stone-300/70 bg-stone-50/80 backdrop-blur-xl dark:border-brand-border dark:bg-brand-surface/85">
         <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-3">
           <button className="flex items-center gap-3 text-right" onClick={() => navigate(homePath)}>
-            <span className="grid h-14 w-14 place-items-center rounded-xl bg-brand-yellow shadow-glow-sm">
-              <Dumbbell className="h-8 w-8 text-surface-dark" />
+            <span className="grid h-14 w-14 place-items-center rounded-xl border border-brand-red-bright/40 bg-brand-red shadow-glow-sm">
+              <Dumbbell className="h-8 w-8 text-brand-text-main" />
             </span>
             <span>
               <span className="block text-sm font-bold">Bahman Coach</span>
-              <span className="block text-xs text-slate-500 dark:text-white/40">{user?.fullName}</span>
+              <span className="block text-xs text-slate-500 dark:text-brand-text-muted">{user?.fullName}</span>
             </span>
           </button>
           <div className="flex items-center gap-2">
             <button
-              className="grid h-12 w-12 place-items-center rounded-xl text-slate-600 transition hover:bg-slate-100/70 disabled:opacity-50 dark:text-white/70 dark:hover:bg-white/[0.07]"
+              className="grid h-12 w-12 place-items-center rounded-xl text-slate-600 transition hover:bg-brand-red/10 hover:text-brand-red disabled:opacity-50 dark:text-brand-text-soft dark:hover:bg-brand-red/15 dark:hover:text-brand-red-text"
               disabled={logout.isPending}
               onClick={() => {
                 logout.mutate(undefined, {
@@ -99,7 +99,7 @@ export function ProtectedLayout() {
       </div>
 
       <nav className="fixed inset-x-0 bottom-6 z-40 flex justify-center md:hidden">
-        <div className="flex items-center gap-1.5 rounded-full border border-white/15 bg-surface-dark/40 px-2.5 py-2 shadow-xl shadow-black/30 backdrop-blur-2xl">
+        <div className="flex items-center gap-1.5 rounded-full border border-brand-border bg-brand-surface/90 px-2.5 py-2 shadow-xl shadow-black/50 backdrop-blur-2xl">
           {links.filter((item) => !('sidebarOnly' in item && item.sidebarOnly)).map((item) => (
             <BottomNavItem key={item.to} {...item} />
           ))}
@@ -127,8 +127,8 @@ function SideNavItem({
       className={({ isActive }) =>
         `flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold transition-all duration-200 ${
           isActive
-            ? 'bg-surface-dark/10 text-surface-dark dark:bg-brand-yellow/15 dark:text-brand-yellow'
-            : 'text-slate-600 hover:bg-slate-100/70 dark:text-white/60 dark:hover:bg-white/[0.07]'
+            ? 'bg-brand-red/10 text-brand-red-strong dark:bg-brand-red/20 dark:text-brand-red-text'
+            : 'text-slate-600 hover:bg-stone-200/70 dark:text-brand-text-muted dark:hover:bg-brand-carbon'
         }`
       }
     >
@@ -154,13 +154,13 @@ function BottomNavItem({
         <div
           className={`grid h-10 w-10 place-items-center rounded-full transition-all duration-200 ${
             isActive
-              ? 'bg-white/90 shadow-md shadow-black/20'
-              : 'bg-white/10 hover:bg-white/20'
+              ? 'bg-brand-red shadow-md shadow-brand-red/25'
+              : 'bg-brand-carbon hover:bg-brand-stone'
           }`}
         >
           <Icon
             className={`h-5 w-5 transition-colors duration-200 ${
-              isActive ? 'text-surface-dark' : 'text-white/70'
+              isActive ? 'text-brand-text-main' : 'text-brand-text-soft'
             }`}
           />
         </div>
