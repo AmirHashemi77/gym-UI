@@ -21,6 +21,7 @@ import { ExercisePicker } from '../components/ExercisePicker';
 import { Button, Card, EmptyState, Input, Modal, PasswordInput, ScrollLoader, SearchBox, Select, Textarea } from '../components/ui';
 import { useAuth } from '../features/auth';
 import { useCreateExercise, useDeleteExercise, useInfiniteExercises, useUpdateExercise } from '../hooks/exercises';
+import { useDebounce } from '../hooks/useDebounce';
 import { useScrollSentinel } from '../hooks/useScrollSentinel';
 import { useSendNotification } from '../hooks/notifications';
 import { useCreateProgram, useExpiredProgramStudents, useProgram, usePrograms } from '../hooks/programs';
@@ -238,8 +239,9 @@ function QuickActionButton({ icon: Icon, label, onClick }: { icon: LucideIcon; l
 
 export function AthletesPage() {
   const [search, setSearch] = useState('');
+  const debouncedSearch = useDebounce(search);
   const [creating, setCreating] = useState(false);
-  const { data, isLoading, isError, error, fetchNextPage, hasNextPage, isFetchingNextPage } = useInfiniteStudents({ search });
+  const { data, isLoading, isError, error, fetchNextPage, hasNextPage, isFetchingNextPage } = useInfiniteStudents({ search: debouncedSearch });
   const { data: expiredResponse, isLoading: expiredLoading } = useExpiredProgramStudents();
   const students = data?.pages.flatMap((p) => p.data.items) ?? [];
   const expiredStudents = expiredResponse?.data ?? [];
@@ -930,10 +932,11 @@ function emptyItem(): DraftProgramExerciseItem {
 export function ExerciseManagementPage() {
   const { user } = useAuth();
   const [search, setSearch] = useState('');
+  const debouncedSearch = useDebounce(search);
   const [editing, setEditing] = useState<Exercise | null>(null);
   const [creating, setCreating] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState<Exercise | null>(null);
-  const { data, isLoading, isError, error, fetchNextPage, hasNextPage, isFetchingNextPage } = useInfiniteExercises({ search });
+  const { data, isLoading, isError, error, fetchNextPage, hasNextPage, isFetchingNextPage } = useInfiniteExercises({ search: debouncedSearch });
   const deleteExercise = useDeleteExercise();
   const exercises = data?.pages.flatMap((p) => p.data.items) ?? [];
   const canManage = user?.role === 'ADMIN' || user?.role === 'COACH';

@@ -32,6 +32,7 @@ import { HomeFoodCategoriesWidget } from "./FoodDatabasePages";
 import { useAuth } from "../features/auth";
 import { useBookmarkExercise, useExercise, useInfiniteExercises, useMuscleGroups, useUnbookmarkExercise } from "../hooks/exercises";
 import { useMyNutritionPlan, useUpdateMealReminder } from "../hooks/nutrition";
+import { useDebounce } from "../hooks/useDebounce";
 import { useScrollSentinel } from "../hooks/useScrollSentinel";
 import { useActiveProgramStats, useProgram, usePrograms } from "../hooks/programs";
 import { useCreateQuestion, useQuestions } from "../hooks/questions";
@@ -382,7 +383,8 @@ function MuscleGroupGrid() {
 
 export function ExerciseSearchPage() {
   const [search, setSearch] = useState("");
-  const { data, isLoading, isError, error, fetchNextPage, hasNextPage, isFetchingNextPage } = useInfiniteExercises({ search });
+  const debouncedSearch = useDebounce(search);
+  const { data, isLoading, isError, error, fetchNextPage, hasNextPage, isFetchingNextPage } = useInfiniteExercises({ search: debouncedSearch });
   const exercises = data?.pages.flatMap((p) => p.data.items) ?? [];
   const sentinelRef = useScrollSentinel(fetchNextPage, hasNextPage && !isFetchingNextPage);
 

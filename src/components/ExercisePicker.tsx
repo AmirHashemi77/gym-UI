@@ -1,11 +1,13 @@
 import { useMemo, useState } from 'react';
 import { useExercises } from '../hooks/exercises';
+import { useDebounce } from '../hooks/useDebounce';
 import { truncateText } from '../utils/text';
 import { Input } from './ui';
 
 export function ExercisePicker({ value, onChange }: { value: string; onChange: (id: string) => void }) {
   const [term, setTerm] = useState('');
-  const { data: response } = useExercises({ search: term });
+  const debouncedTerm = useDebounce(term);
+  const { data: response } = useExercises({ search: debouncedTerm });
   const exercises = response?.data.items ?? [];
   const selected = useMemo(() => exercises.find((item) => item.id === value), [exercises, value]);
 
